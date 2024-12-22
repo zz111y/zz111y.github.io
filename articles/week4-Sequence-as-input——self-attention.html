@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[week4]Sequence as input——self attention | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Sequence as input在有些背景下input是一组数量不定的vector。举例来说，在语句处理领域，可以将每个word视作一个vector；在语音处理方面，可以将一段语音的一个Frame视作一个vector；或者在Graph的问题中，可以将一个node视作一个vector。 Sequence as input的问题主要有以下三种：  每个vector都有一个label（例如POS ta">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[week4]Sequence as input——self attention">
+<meta property="og:url" content="https://zz111y.github.io/articles/week4-Sequence-as-input%E2%80%94%E2%80%94self-attention.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="Sequence as input在有些背景下input是一组数量不定的vector。举例来说，在语句处理领域，可以将每个word视作一个vector；在语音处理方面，可以将一段语音的一个Frame视作一个vector；或者在Graph的问题中，可以将一个node视作一个vector。 Sequence as input的问题主要有以下三种：  每个vector都有一个label（例如POS ta">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3787030471.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/4000611276.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3734183805.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2712051742.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/4055030727.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3755362515.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1149814991.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2304290509.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3114213706.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1109922326.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1437060038.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2963752312.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1545176778.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/500544821.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1543565533.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3259953941.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2841154817.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2899915646.png">
+<meta property="article:published_time" content="2024-08-07T08:53:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:50:17.891Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/08/3787030471.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-week4-Sequence-as-input——self-attention" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/week4-Sequence-as-input%E2%80%94%E2%80%94self-attention.html" class="article-date">
+  <time class="dt-published" datetime="2024-08-07T08:53:00.000Z" itemprop="datePublished">2024-08-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [week4]Sequence as input——self attention
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="Sequence-as-input"><a href="#Sequence-as-input" class="headerlink" title="Sequence as input"></a>Sequence as input</h1><p>在有些背景下input是<strong>一组数量不定的vector</strong>。<br>举例来说，在<strong>语句处理</strong>领域，可以将每个word视作一个vector；在<strong>语音处理</strong>方面，可以将一段语音的一个Frame视作一个vector；或者在<strong>Graph</strong>的问题中，可以将一个node视作一个vector。</p>
+<p>Sequence as input的问题主要有以下三种：</p>
+<ul>
+<li>每个vector<strong>都有一个label</strong>（例如POS tagging）；</li>
+<li>整个sequence的output是<strong>一个label</strong>（例如sentiment analysis、speaker recognization）；</li>
+<li><strong>Model决定输出vector的数量</strong>，叫做<strong>Seq2Seq</strong>（例如翻译）。</li>
+</ul>
+<p>本文以第一种：每个vector<strong>都有一个label</strong>（又叫<strong>Sequence labling</strong>）为例来讨论<strong>Self-attention的工作机制</strong>。</p>
+<h1 id="self-attention"><a href="#self-attention" class="headerlink" title="self-attention"></a>self-attention</h1><p>对于一个sequence，fully-connected network有一个显著的缺陷：<strong>无法考虑多个vector之间的关联</strong>。而HW2中多个vector拼接为一个vector的方法不适用于<strong>seq长度可变</strong>的情况。self-attention就是用来处理sequence as input的情况的。</p>
+<h2 id="工作机制"><a href="#工作机制" class="headerlink" title="工作机制"></a>工作机制</h2><p>对于seq中每一个input vector，self-attention会吃一整个seq的信息，并输output一个特特殊的vector：<br><img src="images/2024/08/3787030471.png" alt="self-attention"><br>具体是如何做到的后面会详细说明，self-attention可以叠加使用多次：self-attention处理整个seq的信息，然后使用fc处理每个单独vector的信息，再使用self-attention处理整个output vector seq的信息…</p>
+<p>假设input seq中有一个vector是$a^i$，那么其输出$b^i$是综合了seq中所有vector得到的：<br><img src="images/2024/08/4000611276.png" alt="self-attention"><br>这里只解释$b^1$的形成机制，其他的同理。</p>
+<h2 id="relevant"><a href="#relevant" class="headerlink" title="relevant"></a>relevant</h2><p>我们想找到所有与$a^1$相关的vector，又不想考虑与$a^1$无关的vector，因此，第一步就是<strong>计算$a^1$与其他vector的相关性</strong>。这里有一个专门处理两个vector $a^i$和$a^j$关联程度的方法，即输入$a^i$和$a^j$，输出其<strong>关联程度$\alpha_{i,j}$</strong>。具体的计算方法不一，较为常见的为<strong>使用Dot-product</strong>：令$a^i$乘以矩阵$W^q$得到$q$，$a^j$乘以矩阵$W^k$得到$k$，那么$\alpha_{i,j}=q\cdot k$，其中$\alpha$叫做<strong>attention score</strong>。还有一种常见的方法为Additive，如下图所示：<br><img src="images/2024/08/3734183805.png" alt="Dot-productive and Additive"><br>本文主要使用Dot-product，这是最常用的，也是transformer中使用的。</p>
+<p>应用在self-attention中，计算$a^1$和其他所有vector的关联性，实际操作中，<strong>自己也要和自己计算关联性</strong>。计算完关联性后，所有的$\alpha$经过一个softmax后得到$\alpha^\prime$（没有什么道理，使用其他normalization也行）：<br><img src="images/2024/08/2712051742.png" alt="compute relevant"></p>
+<p>得到所有的attention score后，要从中提取信息，方法为：对于$\alpha^1$，先将所有的$\alpha$乘以一个矩阵$W^v$得到$v$，然后乘以其对应的attention score，再将结果相加（即对$v$做一个<strong>weighted sum</strong>）得到$b^1$，那么<strong>谁的$v$越接近$b^1$，代表谁和$\alpha^1$越相关</strong>：<br><img src="images/2024/08/4055030727.png" alt=""><br>在这个例子中，从$a^1~a^4$得到$b^1~b^4$的过程，就是<strong>self-attention</strong>的过程。其计算过程看似复杂，但以矩阵的视角来进行，其所有计算都是同时进行的。</p>
+<h2 id="self-attention-matrix-representation"><a href="#self-attention-matrix-representation" class="headerlink" title="self-attention matrix-representation"></a>self-attention matrix-representation</h2><p>所有$b^i$的得到方式与$b^1$同理，那么有：</p>
+<script type="math/tex; mode=display">
+q^i=W^qa^i</script><script type="math/tex; mode=display">
+k^i=W^ka^i</script><script type="math/tex; mode=display">
+v^i=W^va^i</script><p>将所有的$a$拼接为一个矩阵，可以得到：<br><img src="images/2024/08/3755362515.png" alt="self-attention matrix-representation"><br>接下来，每一个$q$会和每一个$k$做Dot-product，得到attention score，同样将其拼接为一个矩阵：<br><img src="images/2024/08/1149814991.png" alt="self-attention matrix-representation"><br>综合以上两步以及normalization，可以得到所有的attention score：<br><img src="images/2024/08/2304290509.png" alt="self-attention matrix-representation"><br>最后对每一个$a$的$v$做一个weighted sum，得到$b$：<br><img src="images/2024/08/3114213706.png" alt="self-attention matrix-representation"></p>
+<p>总结以上所有过程，得到self-attention真正运作的过程：<br><img src="images/2024/08/1109922326.png" alt="self-attention matrix-representation"><br>看似复杂的操作，其中<strong>需要学习的parameters只有$W^q、W^k、W^v$</strong>。</p>
+<h1 id="Multi-head-Self-attention"><a href="#Multi-head-Self-attention" class="headerlink" title="Multi-head Self-attention"></a>Multi-head Self-attention</h1><p>[scode type=”share”]<strong>why multi-head</strong>?<br>两个事物的相关性可能有<strong>多种表现形式</strong>，需要用不同的$q、k、v$来表示不同的相关性[/scode]<br>以two heads为例，其做法为：对于一个$a^i$的$q^i、k^i、v^i$，分别乘以两个不同的矩阵，得到两组矩阵：$q^{i,1}、k^{i,1}、v^{i,1}$和$q^{i,2}、k^{i,2}、v^{i,2}$，对两组矩阵分别进行self-attention。<br><img src="images/2024/08/1437060038.png" alt="2 heads self-attention"><br>随后将其attention score综合起来，得到最终的attention score</p>
+<p><div align="center">
+<img src="images/2024/08/2963752312.png" width="50%">
+</div></p>
+<h1 id="Positional-Encoding"><a href="#Positional-Encoding" class="headerlink" title="Positional Encoding"></a>Positional Encoding</h1><p>上面的self-attention有一个缺陷：<strong>无法考虑每个vector的位置信息</strong>。但位置的信息在某些情况下非常重要。<br>解决方法为使用<strong>Positional Encoding</strong>，即为seq中每一个vector $a$都加上一个位置信息$e$，这个e是<strong>人为设置的</strong>，所以其设置方法仍是一个可深入研究的问题。下图是一个$e$的设置方法举例：<br><img src="images/2024/08/1545176778.png" alt="Positional Encoding"><br>一篇有关Positional Encoding的paper：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2003.09229">Learning to Encode Position for Transformer with Continuous Dynamical Model</a></p>
+<h1 id="Applications"><a href="#Applications" class="headerlink" title="Applications"></a>Applications</h1><p>self-attention在许多方面都有应用，例如transformer <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.03762">《attention is all you need》</a>；BERT <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1810.04805">《BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding》</a></p>
+<h2 id="Truncated-Self-attention"><a href="#Truncated-Self-attention" class="headerlink" title="Truncated Self-attention"></a>Truncated Self-attention</h2><p>self-attention中需要学习的$W^q、W^k、W^v$，其parameters的大小是同seq中vector的数量成平方关系的，因此seq中的vector数量很大很大的时候，parameters的数量会特别大，导致Model训练很困难。因此在某些情况下，可以<strong>只考虑seq中部分vector</strong>，此即Truncated self-attention。例如在语音辨识中，当前vector可能只和其附近的vector有关联，详见<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1910.12977">《Transformer-Transducer: End-to-End Speech Recognition with Self-Attention》</a>。<br><img src="images/2024/08/500544821.png" alt="Truncated self-attention"></p>
+<h2 id="self-attention-for-Image"><a href="#self-attention-for-Image" class="headerlink" title="self-attention for Image"></a>self-attention for Image</h2><p>对于一张图片，可以同时将其三个channels视作一个Sequence，这也可以视作为sequence as input，因此<strong>对于一张图片，也有应用self-attention的可能性</strong>。<br><img src="images/2024/08/1543565533.png" alt="self-attention for Image"><br>下面这两个paper就在image处理中使用了self-attention：<br><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1805.08318">《Self-Attention Generative Adversarial Networks》</a><br><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2005.12872">《End-to-End Object Detection with Transformers》</a></p>
+<h1 id="Self-attention-v-s-CNN"><a href="#Self-attention-v-s-CNN" class="headerlink" title="Self-attention v.s. CNN"></a>Self-attention v.s. CNN</h1><p>self-attention和CNN都是同时考虑多个vector，如果将一组<strong>强相关的vector</strong>视作一个receptive filed，那么相比于CNN的receptive filed，<strong>self-attention</strong>的receptive filed是Model学习得到的。<br><img src="images/2024/08/3259953941.png" alt="Self-attention v.s. CNN"><br>这篇paper使用严谨的数学推导描述了其关系：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1911.03584">《On the Relationship between Self-Attention and Convolutional Layers》</a></p>
+<p>这篇paper中讲述了self-attention和CNN的对比：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2010.11929">《An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale》</a><br><img src="images/2024/08/2841154817.png" alt=""><br>结果显示，在train data较少的时候，CNN表现更好；在train data较多的时候，self-attention效果更好。可能的原因是：self-attention的Model弹性更大，需要更多的data来train。</p>
+<h1 id="Self-attention-v-s-RNN"><a href="#Self-attention-v-s-RNN" class="headerlink" title="Self-attention v.s. RNN"></a>Self-attention v.s. RNN</h1><p>以下图来解释两者的关系：<br><img src="images/2024/08/2899915646.png" alt="Self-attention v.s. RNN"><br>相较于self-attention，RNN<strong>很难考虑距离较远的vector</strong>，并且RNN的无法平行计算，其效率远不如self-attention。因此，self-attention在很大程度上是优于RNN的，当前很多RNN架构也逐渐self-attention化。更详细的讲解：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2006.16236">《ransformers are RNNs: Fast Autoregressive Transformers with Linear Attention》</a></p>
+<h1 id="Self-attention-for-Graph"><a href="#Self-attention-for-Graph" class="headerlink" title="Self-attention for Graph"></a>Self-attention for Graph</h1><p>Graph中的每个node也可以作为seq输入，因此graph也可以应用self-attention。这也是GNN的一种。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/week4-Sequence-as-input%E2%80%94%E2%80%94self-attention.html" data-id="cm4zg7wzd000hwe3k9v1l2lnd" data-title="[week4]Sequence as input——self attention" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/HW-3-CNN.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [HW 3]CNN
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/week3-Why-Deep.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[week3]Why Deep</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

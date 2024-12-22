@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[Week1 extra] Backpropogation | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Backpropagation是一种快速计算gradient的方法。 前置知识——Chain Rule $y&#x3D;g(x),z&#x3D;h(y)$，则$\frac{dz}{dx}&#x3D;\frac{dz}{dy}\frac{dy}{dx}$ $x&#x3D;g(s),y&#x3D;h(s),z&#x3D;k(x,y)$，则$\frac{dz}{ds}&#x3D;\frac{\partial z}{\partial x}\frac{dx}{ds}+\fra">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Week1 extra] Backpropogation">
+<meta property="og:url" content="https://zz111y.github.io/articles/Week1-extra-Backpropogation.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="Backpropagation是一种快速计算gradient的方法。 前置知识——Chain Rule $y&#x3D;g(x),z&#x3D;h(y)$，则$\frac{dz}{dx}&#x3D;\frac{dz}{dy}\frac{dy}{dx}$ $x&#x3D;g(s),y&#x3D;h(s),z&#x3D;k(x,y)$，则$\frac{dz}{ds}&#x3D;\frac{\partial z}{\partial x}\frac{dx}{ds}+\fra">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/4046648254.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/1517802908.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/1956241098.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3080548224.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2510136609.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3090028825.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/131783293.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/4017796866.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3173305372.png">
+<meta property="article:published_time" content="2024-07-13T05:21:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:39:58.810Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/07/4046648254.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Week1-extra-Backpropogation" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/Week1-extra-Backpropogation.html" class="article-date">
+  <time class="dt-published" datetime="2024-07-13T05:21:00.000Z" itemprop="datePublished">2024-07-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [Week1 extra] Backpropogation
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>Backpropagation是一种快速计算gradient的方法。</p>
+<h2 id="前置知识——Chain-Rule"><a href="#前置知识——Chain-Rule" class="headerlink" title="前置知识——Chain Rule"></a>前置知识——Chain Rule</h2><ol>
+<li>$y=g(x),z=h(y)$，则$\frac{dz}{dx}=\frac{dz}{dy}\frac{dy}{dx}$</li>
+<li>$x=g(s),y=h(s),z=k(x,y)$，则$\frac{dz}{ds}=\frac{\partial z}{\partial x}\frac{dx}{ds}+\frac{\partial z}{\partial y}\frac{dy}{ds}$</li>
+</ol>
+<h2 id="Backpropagation"><a href="#Backpropagation" class="headerlink" title="Backpropagation"></a>Backpropagation</h2><p>首先假设有下图这样的Model：<br><img src="images/2024/07/4046648254.png" alt="Model"><br>那么对于损失函数$L$，有：</p>
+<script type="math/tex; mode=display">
+L(\theta)=\sum\limits_{n=1}^NC^n(\theta)</script><p>对于$L$的gradient，有：</p>
+<script type="math/tex; mode=display">
+\frac{\partial L(\theta)}{\partial w}=\sum\limits_{n=1}^N\frac{\partial C^n(\theta)}{\partial w}</script><p>以下图neuron为例：<br><img src="images/2024/07/1517802908.png" alt="neuron"><br>根据<strong>Chain Rule</strong>，$\frac{\partial C}{\partial w}=\frac{\partial z}{\partial w}\frac{\partial C}{\partial z}$，因此需要计算的就是两部分：$\frac{\partial z}{\partial w}$和$\frac{\partial C}{\partial z}$，有如下定义：</p>
+<ol>
+<li><strong>Forward Pass</strong>：Compute $\frac{\partial z}{\partial w}$for all parameters</li>
+<li><strong>Back Pass</strong>：Compute $\frac{\partial C}{\partial z}$ for all activation functions inputs $z$</li>
+</ol>
+<h3 id="Forward-Pass"><a href="#Forward-Pass" class="headerlink" title="Forward Pass"></a>Forward Pass</h3><p>计算$\frac{\partial z}{\partial w}$非常容易，根据上图neuron所示，$\frac{\partial z}{\partial w_1}$即是$w_1$的系数即$x_1$，$\frac{\partial z}{\partial w_2}$即是$w_2$的系数即$x_2$。<br>对于更多的hidden Layer也是如此：<br><img src="images/2024/07/1956241098.png" alt="Forward Pass"><br>如图所示，由于$\frac{\partial z}{\partial w}$是从Input Layer开始逐层前向计算的，因此这个过程就叫做<strong>Forward Pass</strong>。</p>
+<h3 id="Back-Pass"><a href="#Back-Pass" class="headerlink" title="Back Pass"></a>Back Pass</h3><p>考虑如下Model：<br><img src="images/2024/07/3080548224.png" alt="Model"><br>有$\frac{\partial C}{\partial z}=\frac{\partial a}{\partial z}\frac{\partial C}{\partial a}$，其中$\frac{\partial a}{\partial z}$容易求得，即$\sigma^{\prime}(z)$。<br>而$\frac{\partial C}{\partial a}=\frac{\partial z^{\prime}}{\partial a}\frac{\partial C}{\partial z^{\prime}}+\frac{\partial z^{\prime\prime}}{\partial a}\frac{\partial C}{\partial z^{\prime\prime}}$，其中$\frac{\partial z^{\prime}}{\partial a}$和$\frac{\partial z^{\prime\prime}}{\partial a}$容易求得，分别为$w_3、w_4$，我们假设$\frac{\partial C}{\partial z^{\prime}}$和$\frac{\partial C}{\partial z^{\prime\prime}}$已知，那么得到最终结果：</p>
+<script type="math/tex; mode=display">
+\frac{\partial C}{\partial z}=\sigma^{\prime}(z)[w_3\frac{\partial C}{\partial z^{\prime}}+w_4\frac{\partial C}{\partial z^{\prime\prime}}]</script><p>我们可以将其用一个neuron表示：<br><img src="images/2024/07/2510136609.png" alt=""><br>其中，由于$z$是一个在Forward Pass过程中已经被计算出的确定的值，因此$\sigma’(z)$是一个常数。因此，最终的问题归结为$\frac{\partial C}{\partial z^{\prime}}$和$\frac{\partial C}{\partial z^{\prime\prime}}$如何计算。这里分两种情况来进行讨论：</p>
+<ol>
+<li>如果$z’$和$z’’$所在的layer<strong>是Output Layer</strong>，那么有：<script type="math/tex; mode=display">
+\frac{\partial C}{\partial z^{\prime}}=\frac{\partial y_1}{\partial z^{\prime}}\frac{\partial C}{\partial y_1}</script><script type="math/tex; mode=display">
+\frac{\partial C}{\partial z^{\prime\prime}}=\frac{\partial y_2}{\partial z^{\prime\prime}}\frac{\partial C}{\partial y_2}</script>其中各个部分均容易求得；</li>
+<li>如果$z’$和$z’’$所在的layer<strong>不是Output Layer</strong>，如下所示：<br><img src="images/2024/07/3090028825.png" alt=""><br>那么对于$\frac{\partial C}{\partial z^{\prime}}$，有：<script type="math/tex; mode=display">
+\frac{\partial C}{\partial z^{\prime}}=\frac{\partial z_a}{\partial z^{\prime}}\frac{\partial C}{\partial z_a}+\frac{\partial z_b}{\partial z^{\prime}}\frac{\partial C}{\partial z_b}</script></li>
+</ol>
+<p>到这里我们就会发现，计算的方法会形成一个递归，直到我们计算到Output Layer。<br>举个例子：假设有如下Model<br><img src="images/2024/07/131783293.png" alt="Model"><br>要计算$\frac{\partial C}{\partial z_1}、\frac{\partial C}{\partial z_2}$，就要首先计算$\frac{\partial C}{\partial z_3}、\frac{\partial C}{\partial z_4}$；要得到$\frac{\partial C}{\partial z_3}、\frac{\partial C}{\partial z_4}$，就要首先计算$\frac{\partial C}{\partial z_5}、\frac{\partial C}{\partial z_6}$。因此，我们的计算顺序为：</p>
+<script type="math/tex; mode=display">
+\frac{\partial C}{\partial z_5}、\frac{\partial C}{\partial z_6}\rightarrow\frac{\partial C}{\partial z_3}、\frac{\partial C}{\partial z_4}\rightarrow\frac{\partial C}{\partial z_1}、\frac{\partial C}{\partial z_2}</script><p>我们用下图直观地表示这一过程：<br><img src="images/2024/07/4017796866.png" alt="Back Pass"><br>可以发现，这是一个<strong>从Output Layer开始反向逐层计算的过程</strong>，因此叫做<strong>Back Pass</strong>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>用一张图来表示整个Backpropagation的过程<br><img src="images/2024/07/3173305372.png" alt="Backpropagation"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/Week1-extra-Backpropogation.html" data-id="cm4zf3c6900007y3k6he4fulk" data-title="[Week1 extra] Backpropogation" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/Week1-Extra-%E7%94%A8Logistic-Regression%E5%AE%9E%E7%8E%B0classification.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [Week1 Extra] 用Logistic Regression实现classification
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/Week1-Introduction-of-Deep-Learning.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[Week1] Introduction of Deep Learning</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

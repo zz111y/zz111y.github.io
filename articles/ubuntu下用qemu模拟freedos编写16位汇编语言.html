@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>ubuntu下用qemu模拟freedos编写16位汇编语言 | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="最近在做微机原理实验，需要用到dos系统+8086写汇编，同时os课程中也对模拟操作系统有一定的需求，因此选择了qemu作为操作平台。 根据我的理解，qemu就是一个虚拟机管理程序，可以用它来在PC上模拟各种操作系统、架构（其实就是给你一个空壳子cpu，包括x86的、arm的、risc-v的等等） 一个例子——qemu模拟ubuntu先拿用qemu模拟ubuntu来举例，熟悉一下用qemu的流程，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ubuntu下用qemu模拟freedos编写16位汇编语言">
+<meta property="og:url" content="https://zz111y.github.io/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="最近在做微机原理实验，需要用到dos系统+8086写汇编，同时os课程中也对模拟操作系统有一定的需求，因此选择了qemu作为操作平台。 根据我的理解，qemu就是一个虚拟机管理程序，可以用它来在PC上模拟各种操作系统、架构（其实就是给你一个空壳子cpu，包括x86的、arm的、risc-v的等等） 一个例子——qemu模拟ubuntu先拿用qemu模拟ubuntu来举例，熟悉一下用qemu的流程，">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3951787082.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/39489604.png">
+<meta property="article:published_time" content="2024-10-13T10:21:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T10:11:34.903Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/10/3951787082.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-ubuntu下用qemu模拟freedos编写16位汇编语言" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html" class="article-date">
+  <time class="dt-published" datetime="2024-10-13T10:21:00.000Z" itemprop="datePublished">2024-10-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Env-Setting/">Env Setting</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      ubuntu下用qemu模拟freedos编写16位汇编语言
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>最近在做微机原理实验，需要用到dos系统+8086写汇编，同时os课程中也对模拟操作系统有一定的需求，因此选择了qemu作为操作平台。</p>
+<p>根据我的理解，qemu就是一个虚拟机管理程序，可以用它来在PC上模拟各种操作系统、架构（其实就是给你一个空壳子cpu，包括x86的、arm的、risc-v的等等）</p>
+<h1 id="一个例子——qemu模拟ubuntu"><a href="#一个例子——qemu模拟ubuntu" class="headerlink" title="一个例子——qemu模拟ubuntu"></a>一个例子——qemu模拟ubuntu</h1><p>先拿用qemu模拟ubuntu来举例，熟悉一下用qemu的流程，加深一下对qemu的理解<br>首先安装qemu<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt install qemu qemu-kvm</span><br></pre></td></tr></table></figure><br>这里的qemu-kvm具体是什么并没有具体了解，只是知道他可以让你拥有<strong>更好的体验</strong>。<br>然后创建一个虚拟硬盘文件（默认在当前路径）：<br><code>qemu-img create -f qcow2 ubuntu-vm.img 20G</code><br>qemu-img用于操作虚拟硬盘镜像文件</p>
+<ul>
+<li><code>-f qcow2</code>指定了镜像的格式，qcow2就是一种格式</li>
+</ul>
+<p>剩下两个参数就是名字和大小，不做过多解释。但有一点要注意的是，虽然指定了20G，但它一开始不会用那么多，qcow2只会在写入数据时动态分配空间。<br><strong>可以使用<code>qemu-img info xxx.img</code>查看虚拟硬盘信息</strong>。</p>
+<p>假设我们已经有了一个ubuntu.iso文件，那么就可以用qemu启动这个镜像了：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-x86_64 -boot d -cdrom ubuntu.ios -m 2048 -hda ubuntu-vm.img -cpu host -smp 2</span><br></pre></td></tr></table></figure><br>解释一下这些参数：</p>
+<ul>
+<li><code>qemu-system-x86_64</code>：指定使用x86-64架构的qemu</li>
+<li><code>-boot d</code>：指定从光盘设备cdrom启动，通常用于从iso镜像启动操作系统</li>
+<li><code>-cdrom ubuntu.iso</code>：指定要加载的iso文件作为cdrom设备，这里用的是我们下载的ubuntu.iso</li>
+<li><code>-m 2048</code>：为其分配2048MB内存</li>
+<li><code>-hda ubuntu-vm.img</code>：指定虚拟硬盘文件</li>
+<li><code>-cpu host</code>：让qemu使用PC的CPU功能，提高性能</li>
+<li><code>-smp 2</code>：为虚拟机分配两个CPU核心</li>
+</ul>
+<p>然后就会打开qemu界面开始安装了。这里省略安装过程，假设已经安装完成，那么下次启动的时候就可以直接：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-x8^_64 -m 2048 -hda ubuntu-vm.img -cpu host -smp 2</span><br></pre></td></tr></table></figure><br>这样qemu就会直接从对应的虚拟硬盘启动操作系统了。<br>[scode type=”blue”]</p>
+<ul>
+<li><strong>iso文件</strong>：光盘映像（CD image），具体应用有：安装操作系统，软件分发、系统备份恢复、创建可启动的USB</li>
+<li><strong>img文件</strong>：磁盘影像，具体应用有：硬盘备份和恢复、嵌入式开发、虚拟机映像、usb驱动器映像</li>
+</ul>
+<p>[/scode]<br>[scode type=”share”]<br>对模拟ubuntu系统（其实就是装系统）的进一步理解：<br>在命令<code>qemu-system-x86_64 -boot d -cdrom ubuntu.iso -m 2048 -hda ubuntu-vm.img -cpu host -smp 2</code>中，我们可以看到，同时指定了iso文件和img文件。iso文件的作用是<strong>指定了要从中引导的光盘映像</strong>，<code>-boot d</code>表示虚拟机会首先尝试从光盘设备启动，那么qemu就会从ubuntu.iso中加载操作系统的安装程序，允许用户在虚拟机中安装ubuntu；而img文件指定了虚拟机的硬盘镜像文件，我们在安装ubuntu时，<strong>系统会将文件、配置和用户数据写入ubuntu-vm.img</strong>，那么安装好下次启动时，就可以直接从ubuntu-vm.img启动了，而不再需要从iso文件启动。<br>[/scode]</p>
+<h1 id="模拟dos"><a href="#模拟dos" class="headerlink" title="模拟dos"></a>模拟dos</h1><p>我们从<a target="_blank" rel="noopener" href="http://freedos.org">freedos官网</a>下载好镜像文件，我下载到的是FD13-LiveCD.zip文件，解压后得到了一个FD13BOOT.img文件和FD13LIVE.iso文件，总之最后能得到iso文件就行了<br>然后我们创建一个虚拟硬盘<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-img create -f qcow2 freedos.img 500M</span><br></pre></td></tr></table></figure><br>然后直接用iso文件启动安装即可：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">qemu-system-i386 -hda freedos.img -cdrom FD13Live.iso -boot d</span><br></pre></td></tr></table></figure><br>[scode type=”share”]i386是用于模拟intel 80386(i386)及其兼容处理器的虚拟机，i386是intel第三代x86处理器架构，也被称为intel 386，他是第一款支持32位运算的处理架构。同时，他也向后兼容16位的dos系统。[/scode]<br>这里-m默认256MB或512MB，-cpu默认选择了兼容的，-smp默认使用1个。freedos是一个轻量级的操作系统，这些对freedos足够了。安装时，选择install to harddisk。</p>
+<p>经历漫长的安装后，得到如下界面，输入ver可查看freedos版本信息，代表安装成功：<br><img src="images/2024/10/3951787082.png" alt="2024-10-12T17:06:25.png"><br>然后我们在终端ctrl+c退出qemu，再次开启时，只要使用<code>qemu-system-x86_64 -hda freedos.img</code>即可无需iso启动。</p>
+<h1 id="安装nasm"><a href="#安装nasm" class="headerlink" title="安装nasm"></a>安装nasm</h1><p>编译汇编我选择了<a target="_blank" rel="noopener" href="https://www.nasm.us/">nasm</a>，下载好程序zip后，解压到本地。现在的问题就是，nasm是下载到本地的，而不是下载到虚拟机上的，虚拟dos上固然无法直接访问PC上的文件，并且为虚拟dos联网也麻烦的很。因此我们这里选择<strong>设置一块额外的虚拟硬盘放nasm，然后挂载到dos</strong>。</p>
+<p>首先建一个img：<code>qemu-img create -f qcow2 nasm.img 30M</code><br>然后<code>qemu-system-i386 -hda freedos.img -hdb nasm.img -boot c</code>，即可启动freedos，并将nasm.img挂载为第二块硬盘。<br>然后我们需要对其进行格式化，使得dos能识别他。首先使用fdisk命令进入硬盘管理，选择选项5：change current fixed disk drive，这里应该能看到刚刚挂载的第二块硬盘，只是他还没有被格式化。然后选择它，<br>选择选项1：create dos partition or logical dos drive，选择选项1：create primary dos partition，创建好后选择选项2：set active partition激活他，然后重启dos。<br>重启后，进入分区D：<code>D:</code>，使用<code>format D:</code>可对D:进行格式化，输入一个volume label（随意）即可。<br>最后输入<code>dir</code>，如果显示no files证明挂载成功。</p>
+<p>现在我们要处理的下一个问题是，将nasm文件拷贝到我们的虚拟硬盘里。这里使用nbd（network block device）的方法，这种方法可以将远程服务器上的块设备（硬盘、硬盘镜像等）暴露为本地设备，并像本地硬盘一样读写。<br>回到ubuntu终端，依次执行以下命令：</p>
+<ol>
+<li><code>sudo modprobe nbd</code>：加载内核模块nbd，使得linux系统可以支持nbd；</li>
+<li><code>sudo qemu-nbd --connect=/dev/nbd0 nasm.img</code>：使用qemu-nbd将虚拟硬盘镜像暴露为本地块设备，并把nasm.img视作/dev/nbd0</li>
+<li><code>sudo mount /dev/nbd0 /mnt</code>：使用mount命令将/dev/nbd0挂载到/mnt上，挂载后虚拟硬盘镜像的内容会显示在/mnt目录下，用户可以读写该镜像内容（使用<code>sudo fdisk -l /dev/nbd0</code>可查看其信息，如果是fat16文件系统，则需要使用：<code>sudo mount /dev/nbd0p0 /mnt</code>）</li>
+<li><code>sudo cp /path_to_nasm/* /mnt</code>：将nasm里的东西复制到已经挂载的虚拟硬盘镜像内（即/mnt）</li>
+<li><code>sudo umount /mnt</code>：将虚拟硬盘镜像从/mnt卸载</li>
+<li><code>sudo qemu-nbd --disconnect /dev/nbd0</code>：断开nasm.img与/dev/nbd0的连接，取消对nasm.img的映射</li>
+</ol>
+<p>再次用<code>qemu-system-i386 -hda freedos.img -hdb nasm.img -boot c</code>启动dos后，进入D盘，即可看到nasm的相关文件已经存在，此时输入<code>nasm</code>，显示如下内容，表示安装成功：<br><img src="images/2024/10/39489604.png" alt=""></p>
+<p>我们还可以做进一步的升级。此时nasm只有在其所在文件夹才能运行，我们要把它配为环境变量，这样，在任何地方都能使用nasm命令了。<br>用<code>echo %path%</code>可以查看系统默认环境变量目录，我这里是c:\freedos\bin，现在我们只要把nasm.exe复制到这里面即可：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copy your_path\nasm.exe c:\freedos\bin\</span><br></pre></td></tr></table></figure><br>回到C盘，运行<code>nasm -V</code>可查看版本，代表配置成功。</p>
+<h1 id="编写汇编程序代码并测试运行"><a href="#编写汇编程序代码并测试运行" class="headerlink" title="编写汇编程序代码并测试运行"></a>编写汇编程序代码并测试运行</h1><p>使用<code>edit hello.asm</code>创建第一个汇编程序，然后编辑以下内容：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">section .data</span><br><span class="line">    msg db &#x27;Hello, World!&#x27;, &#x27;$&#x27;  ; 字符串以 $ 结束</span><br><span class="line"></span><br><span class="line">section .text</span><br><span class="line">    org 0x100  ; 程序开始地址为0x100</span><br><span class="line"></span><br><span class="line">start:</span><br><span class="line">    ; 输出字符串</span><br><span class="line">    mov dx, msg   ; 将消息地址加载到DX寄存器</span><br><span class="line">    mov ah, 9     ; DOS功能调用，功能号9（显示字符串）</span><br><span class="line">    int 0x21      ; 通过中断调用DOS服务</span><br><span class="line"></span><br><span class="line">    ; 正常退出程序</span><br><span class="line">    mov ah, 0x4c  ; DOS功能调用，功能号4Ch（终止程序）</span><br><span class="line">    int 0x21      ; 通过中断返回到DOS</span><br><span class="line"></span><br></pre></td></tr></table></figure><br>保存退出后，使用<code>nsam -f bin hello.asm -o hello.com</code>编译，生成一个hello.com的可执行文件，然后直接<code>hello.com</code>，就可以在屏幕上打印出对应内容了。</p>
+<p>参数解释：<br><code>-f bin</code>：指定输出文件格式为binary，<code>-f bin</code>表示生成一个不包含头部信息的纯二进制文件，这个文件可以直接在dos或其他兼容的系统上执行。<br>[scode type=”share”]COM文件是简单的二进制文件，不包含任何文件头或元数据。这使得加载和执行过程非常简单。DOS 在加载 COM 文件时只需将其内容直接放入内存并跳转到指定地址（通常是 0x100）。[/scode]</p>
+<h1 id="后记——在dos中debug汇编代码"><a href="#后记——在dos中debug汇编代码" class="headerlink" title="后记——在dos中debug汇编代码"></a>后记——在dos中debug汇编代码</h1><p>以上面的程序为例，执行<code>debug hello.com</code>，即可进入debug<br>[scode type=”share”]dos内置debug，可以用来调试.com文件或.exe文件[/scode]<br>常见debug命令：</p>
+<ul>
+<li>D(Dump)：显示内存内容，例如<code>d 0100</code>会从0100开始显示内存</li>
+<li>E(Enter)：修改内存内容，例如<code>e 0100</code>可以修改地址0100的内容</li>
+<li>R(Register)：显示和修改寄存器，例如<code>r</code>可以显示所有寄存器内容，<code>r ax</code>可以修改ax的值</li>
+<li>T(Trace)：单步执行</li>
+<li>G(Go)：运行程序直到遇到<code>int 20h</code>或<code>int 21h</code></li>
+<li>Q(Quit)：退出debug</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html" data-id="cm4zg7wzb0006we3k4vqa2zgj" data-title="ubuntu下用qemu模拟freedos编写16位汇编语言" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          linux配置git并部署到github
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/week12-extra-Q-learning.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[week12 extra] Q-learning</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

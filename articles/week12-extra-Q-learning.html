@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[week12 extra] Q-learning | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="在RL中，学习了critic的方法。本篇文章将介绍另一种设计critic的方法：State-action value function。 State-action value function $Q^\pi(s,a)$$Q^\pi(s,a)$的定义是给定一个actor $\pi$，在state $s$下采取action $a$后期望得到的reward。通俗来讲，在state $s$下，actor不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[week12 extra] Q-learning">
+<meta property="og:url" content="https://zz111y.github.io/articles/week12-extra-Q-learning.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="在RL中，学习了critic的方法。本篇文章将介绍另一种设计critic的方法：State-action value function。 State-action value function $Q^\pi(s,a)$$Q^\pi(s,a)$的定义是给定一个actor $\pi$，在state $s$下采取action $a$后期望得到的reward。通俗来讲，在state $s$下，actor不">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3535350820.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2774954914.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/830663718.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/878581452.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3132934395.png">
+<meta property="article:published_time" content="2024-10-05T15:02:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T10:11:02.233Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/10/3535350820.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-week12-extra-Q-learning" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/week12-extra-Q-learning.html" class="article-date">
+  <time class="dt-published" datetime="2024-10-05T15:02:00.000Z" itemprop="datePublished">2024-10-05</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [week12 extra] Q-learning
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>在RL中，学习了critic的方法。本篇文章将介绍另一种设计critic的方法：State-action value function。</p>
+<h1 id="State-action-value-function-Q-pi-s-a"><a href="#State-action-value-function-Q-pi-s-a" class="headerlink" title="State-action value function $Q^\pi(s,a)$"></a>State-action value function $Q^\pi(s,a)$</h1><p>$Q^\pi(s,a)$的定义是<strong>给定一个actor $\pi$，在state $s$下采取action $a$后期望得到的reward</strong>。<br>通俗来讲，在state $s$下，actor不一定采取action $a$，但我们强制采取action $a$，后面让actor自己玩下去会得到的cumulated reward。<br>$Q^\pi$有两种表示方法，其中第二种只适用于action是离散的情况：<br><img src="images/2024/10/3535350820.png" alt="$Q^\pi$"></p>
+<p>训练出这样一个Q-function，即可做RL，叫做Q-learning。整体框架如下：<br><img src="images/2024/10/2774954914.png" alt="Q-learning"></p>
+<ol>
+<li>初始化一个policy $\pi$（可随机）</li>
+<li>用这个policy去learn一个Q-function（用TD or MC）</li>
+<li><strong>只要learn到这个Q-function，那么一定能找到一个更好的policy $\pi^\prime$</strong></li>
+</ol>
+<p>如何定义“更好”：对于所有的state $s$，$V^{\pi^\prime}(s)\geq V^\pi(s)$<br>有了Q后，找$\pi^\prime$的方法：$\pi^\prime(s)=\mathop{\arg\max}\limits_aQ^\pi(s,a)$<br>上式的意思为，假设我们<strong>已经learn到了$\pi$的Q-function</strong>，现在<strong>给定某一个state $s$</strong>，我们把<strong>所有可能的action一一代入Q-function</strong>，看看<strong>哪个a可以让Q-function的value最大</strong>，那么这个action就是<strong>$\pi^\prime$会在$s$下采取的action</strong>。<br>实际上没有一个network来确定$\pi^\prime$，他是根据Q-function推出来的。但是这里存在的问题是action可能是continuous的，这个后面解决。<br>[scode type=”share”]对$\pi^\prime$一定比$\pi$好的证明：<br>已知$\pi^\prime(s)=\mathop{\arg\max}\limits_aQ^\pi(s,a)$，要证明对于所有的state $s$，$V^{\pi^\prime}(s)\geq V^\pi(s)$<br>证明：<br>$V^\pi(s)=Q^\pi(s,\pi(s))\leq\mathop{\max}\limits_aQ^\pi(s,a)=Q^\pi(s,\pi^\prime(s))$<br>即$V^\pi(s)\leq Q^\pi(s,\pi^\prime(s))$<br>而</p>
+<script type="math/tex; mode=display">
+\begin{align*}
+  V^\pi(s) &\leq Q^\pi(s,\pi^\prime(s)) \\
+    &= E[r_t+V^\pi(s_{t+1})|s_t=s,a_t=\pi^\prime(s_t)] \\
+    &\leq E[r_t+Q^\pi(s_{t+1},\pi^\prime(s_{t+1})|s_t=s,a_t=\pi^\prime(s_t)] \\
+    &= E[r_{t}+r_{t+1}+V^\pi(s_{t+2})|...] \\
+    &\leq E[r_{t}+r_{t+1}+Q^\pi(s_{t+2},\pi^\prime(s_{t+2})|...]...\leq V^{\pi^\prime}(s)
+\end{align*}</script><p>[/scode]</p>
+<h1 id="Tips-of-Q-learning"><a href="#Tips-of-Q-learning" class="headerlink" title="Tips of Q-learning"></a>Tips of Q-learning</h1><h2 id="Target-Network"><a href="#Target-Network" class="headerlink" title="Target Network"></a>Target Network</h2><p>假如我们使用TD来定义critic，那么有：$Q^\pi(s_t,a_t)=r_t+Q^\pi(s_{t+1},\pi(s_{t+1}))$<br>在learn的时候会发现这样的function并不好learn。假设这是一个regression的问题，那么你会发现output $Q^\pi(s_t,a_t)$和target $r_t+Q^\pi(s_{t+1},\pi(s_{t+1}))$都是会变化的。相当于要fit的target一直在变化。那么我们在实作的时候会固定产生target的$Q^\pi$的参数，这个$Q^\pi$叫做target network，那么此时得到的target就是固定的了。实作时，会update多次后统一$Q^\pi$。<br><img src="images/2024/10/830663718.png" alt="target network"></p>
+<h2 id="Exploration"><a href="#Exploration" class="headerlink" title="Exploration"></a>Exploration</h2><p>由于$a=\mathop{\arg\max}\limits_aQ(s,a)$，policy只会采取固定的action。<br>假设要估测在state $s$采取某个action得到的Q-value，那么一定要在那个state采取过那个action（如果Q-function是network的话，问题不会非常严重）。如果没采取过那个action，那么估测出来的Q-value就会都是一个初始值。这样就只会一直sample到之前采取过的某个action。<br>因此就需要Exploration，让actor探索更多的可能。<br>解决方法：<br><img src="images/2024/10/878581452.png" alt=""></p>
+<h2 id="Replay-Buffer"><a href="#Replay-Buffer" class="headerlink" title="Replay Buffer"></a>Replay Buffer</h2><p>把每个policy和环境互动搜集到的资料放到replay buffer里面，装满后丢掉旧的资料。因此replay buffer里面装的是很多不同的policy搜集到的资料。训练的时候，在replay buffer里随机sample一些data去训练。这样做好似变成了off-policy的，这样做的好处：</p>
+<ul>
+<li>大大减小和环境互动搜集资料的时间</li>
+<li>data更加diverse</li>
+</ul>
+<p>[scode type=”yellow”]我们需要的是$\pi$的experience，但如果用replay buffer的话，不就混杂了一些其他的experience吗？<br>在理论上没有问题，留作思考[/scode]</p>
+<h2 id="Typical-Q-learning-Algorithm"><a href="#Typical-Q-learning-Algorithm" class="headerlink" title="Typical Q-learning Algorithm"></a>Typical Q-learning Algorithm</h2><ul>
+<li>初始化Q-function $Q$以及target Q-function $\hat Q=Q$</li>
+<li>对于每个episode<ul>
+<li>对于每个step $t$<ul>
+<li>给定一个state $s_t$，依据$Q$采取一个action $a_t$（exploration）</li>
+<li>获得reward $r_t$，到达新的state $s_{t+1}$</li>
+<li>将$(s_t,a_t,r_t,s_{t+1})$放入replay buffer</li>
+<li>从replayb buffer中sample一批$(s_i,a_i,r_i,s_{i+1})$</li>
+<li>计算target $y=r_i+\mathop{\max}\limits_a\hat Q(s_{i+1},a)$</li>
+<li>更新$Q$使得$Q(s_i,a_i)$和$y$越近越好（regression）</li>
+<li>每C步令$\hat Q=Q$</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="Double-DQN"><a href="#Double-DQN" class="headerlink" title="Double DQN"></a>Double DQN</h2><p>Q-value经常会被高估：<br><img src="images/2024/10/3132934395.png" alt=""><br>实际的值往往小于Q-value，用Double DQN估测的值会和实际的值很接近。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/week12-extra-Q-learning.html" data-id="cm4zg7wzb0009we3ked2z1jem" data-title="[week12 extra] Q-learning" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          ubuntu下用qemu模拟freedos编写16位汇编语言
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ubuntu环境下多版本cuda的安装与切换</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

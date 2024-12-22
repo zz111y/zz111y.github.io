@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[week6]Generation | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Generative的Model需要input一个x，同时再从某个distribution中sample一个z，将其一同送入Model，最终产生output。由于sample出的z不同，导致相同的input可能会产生不同的output，这就是Generation一个最大的特点——机器具有创造力。比如AI绘画，给定一些特征，每次产生的图片都不相同，这就是Generation的作用。 GAN在Gene">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[week6]Generation">
+<meta property="og:url" content="https://zz111y.github.io/articles/week6-Generation.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="Generative的Model需要input一个x，同时再从某个distribution中sample一个z，将其一同送入Model，最终产生output。由于sample出的z不同，导致相同的input可能会产生不同的output，这就是Generation一个最大的特点——机器具有创造力。比如AI绘画，给定一些特征，每次产生的图片都不相同，这就是Generation的作用。 GAN在Gene">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3191407772.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1227872357.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/365059681.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2561409770.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1496421553.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2850269967.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1114826254.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3743297587.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/265942251.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1818155286.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3868237538.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3216989683.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1407199455.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2856423426.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1093908052.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/163771772.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1652356998.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2974453781.png">
+<meta property="article:published_time" content="2024-08-13T15:31:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:52:11.349Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/08/3191407772.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-week6-Generation" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/week6-Generation.html" class="article-date">
+  <time class="dt-published" datetime="2024-08-13T15:31:00.000Z" itemprop="datePublished">2024-08-13</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [week6]Generation
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>Generative的Model需要input一个x，同时再从<strong>某个distribution中sample一个z</strong>，将其一同送入Model，最终产生output。<br>由于sample出的z不同，导致相同的input可能会产生不同的output，这就是Generation一个最大的特点——机器具有<strong>创造力</strong>。<br><img src="images/2024/08/3191407772.png" alt="Generation"><br>比如AI绘画，给定一些特征，每次产生的图片都不相同，这就是Generation的作用。</p>
+<h1 id="GAN"><a href="#GAN" class="headerlink" title="GAN"></a>GAN</h1><p>在Generative Model中，其中一个知名的是<strong>Generative Adversarial Network</strong>（GAN）。有各种各样GAN的变形会在前面加上其他英文字母，例如BGAN、CGAN、SGAN…</p>
+<h2 id="Unconditional-generation"><a href="#Unconditional-generation" class="headerlink" title="Unconditional generation"></a>Unconditional generation</h2><p>unconditional generation就是直接用一个Distribution sample出来的z作为input产生output，例如动漫头像生成器。<br>GAN可以分为generator和discriminator。<br>Generator输入的z是一般是一个Low-dim vector（通常50、100dim这种的），而output是一个high-dim vector，例如一张图片，其dimention可以是3×256×256。<br>Discriminator本质上就是一个neural network，它接收Generator输出的东西，输出一个数字，其值代表<strong>Generator生成结果的好坏</strong>。</p>
+<p>以动漫头像生成举例，Generator接收一个随机sample的vector，然后产生一张图片，Discriminator接收这个图片，然后产生一个值，用来判断这张图片是不是生成的。</p>
+<p>Generator和Discriminator的关系像是自然界中的<strong>捕食者和被捕食者</strong>，Generator试图去迷惑Discriminator，而Discriminator试图去拆穿Generator产生的东西，<strong>两者在不断的进化（训练）中共同进步</strong>，这就是Adversarial的由来。<br><img src="images/2024/08/1227872357.png" alt="Generator and Discriminator"></p>
+<h2 id="Algorithm"><a href="#Algorithm" class="headerlink" title="Algorithm"></a>Algorithm</h2><p>首先初始化二者的parameters，在之后的每次迭代中：<br><strong>step 1</strong>：<br>固定Generator的parameters，然后用真正的东西（即train data）和Generator产生的东西去训练Discriminator，让其能有效拆穿Generator；<br><strong>step 2</strong>：<br>固定Discriminator的parameters，然后训练Generator让他努力去欺骗Discriminator。具体欺骗方法为：让Generator产生一个结果，放入Discriminator，训练Generator使其产生的结果在Discriminator中获得高分（更像真实的而非生成的）<br>如果将二者视作一个大的network：<br><img src="images/2024/08/365059681.png" alt="Large Network"></p>
+<hr>
+<p>训练GAN的步骤和训练其他network的步骤是没有什么差异的，同样都是使用Loss，然后Gradient Descend之类的Optimization。<br><img src="images/2024/08/2561409770.png" alt="GAN"><br>一个生成动漫头像非常好的Model：<a target="_blank" rel="noopener" href="https://gwern.net/face">《Making Anime Faces With StyleGAN》</a></p>
+<h2 id="Theory-behind-GAN"><a href="#Theory-behind-GAN" class="headerlink" title="Theory behind GAN"></a>Theory behind GAN</h2><p>实际上我们要做的是：<strong>使GAN生成的output的distribution和实际事物（即train data）的distribution尽可能接近</strong>。<br><img src="images/2024/08/1496421553.png" alt="Gan&#39;s Objective"><br>那么如何衡量两个Distribution的相似度？<strong>使用divergence</strong>。divergence越小表示两个distribution越接近。因此我们的目的可以表示为：</p>
+<script type="math/tex; mode=display">
+G^*=\mathop{\arg\min}\limits_GDiv(P_G,P_{data})</script><p>但真正的问题是<strong>如何计算divergence</strong>，使用一些常见的divergence用于GAN，其计算过于复杂无法实现。</p>
+<p>在GAN中使用了一种做法，<strong>只要知道如何从$P_G$和$P_{data}$sample出东西来，而不需要知道其具体的formulation，就能计算divergence</strong>。<br>如何smaple？从train data中直接sample就可以得到$P_{data}$，从Generator的结果中sample出一些vector，即可得到$P_G$。<br>总结一句话就是说，<strong>我们不需要知道$P_G$和$P_{data}$具体的formulation，只需要sample一些东西就能计算divergence</strong>。</p>
+<p>这需要依靠Discriminator。我们要训练一个Discriminator，使其<strong>看到real data就给出一个较高的分数，而看到一个Generative data就给出一个较低的分数</strong>。因此我们要得到：</p>
+<script type="math/tex; mode=display">
+D^*=\mathop{\arg\max}\limits_DV(D,G)</script><p>其中$V(D,G)$就是Discriminator的Objective Function：</p>
+<script type="math/tex; mode=display">
+V(D,G)=E_{y\sim p_{data}}[logD(y)]+E_{y\sim p_{G}}[log(1-D(y))]</script><p>意思就是如果有一些y是从real data里产生的，那么就取$logD(y)$；如果有一些y是从generative data里产生的，那么就取$1-logD(y)$。<br>这样做的理由也很明显，<strong>要想maximum V，那么一个data如果是real的，那么通过Discriminator得到的分数越大越好，如果是generative的，那么分数就越小越好</strong>。<br>[scode type=”share”]minimize的function叫<strong>Loss function</strong><br>maximum的function叫<strong>objective function</strong>[/scode]<br>[scode type=”blue”]为什么要这样定义objective function呢？<br>这个objective就是负的cross-entropy。其实Discriminator的工作像是一个classifier，将real当作class 1，将generative当作class 2，由于classifier的loss function是cross entropy，为了将Discriminator和classifier挂上钩，因此就定义为了负的cross entropy[/scode]<br>然而，人们发现<strong>maximum objective value和JS Divergence是有关的</strong>。推导过程：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1406.2661">《Generative Adversarial Networks》</a>。虽然不知道怎么算Divergence，但是我们可以算objective function来间接去优化Divergence。<br>[scode type=”blue”]<strong>一种直观的理解</strong>：假如$P_G$和$P_{data}$很像，那么divergence就会很小，那么就说明很难区分，此时classifier的表现就不那么好，因此会得到一个很大的cross-entorpy，就会有一个很小$\mathop{\arg\max}\limits_DV(D,G)$。反之同理。[/scode]<br>原目标为$G^*=\mathop{\arg\min}\limits_GDiv(P_G,P_{data})$因此我们就可以用$\mathop{\arg\max}\limits_DV(D,G)$去替换divergence了：</p>
+<script type="math/tex; mode=display">
+G^*=\mathop{\arg}\mathop{\min}\limits_G\mathop{\max}\limits_DV(D,G)</script><p>甚至可以设计不同的objective function去估计不同的divergence：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1606.00709">《f-GAN: Training Generative Neural Samplers using Variational Divergence Minimization》</a></p>
+<hr>
+<p>即便这样，GAN仍旧很难train——<strong>No pain,no GAN.</strong></p>
+<h2 id="Tips-for-GAN——WGAN"><a href="#Tips-for-GAN——WGAN" class="headerlink" title="Tips for GAN——WGAN"></a>Tips for GAN——WGAN</h2><p>使用JS divergence会遇到这样一个问题：假设要生成一张3x256x256的动漫头像，那么有3x256x256个feature，这是一个很高维度的distribution，而真正的动漫头像$P_{data}$<strong>可能只是这个高维空间中的一个低维manifold</strong>，好比二维平面中的一条线，generative的结果$P_{G}$也是这样的一个manifold。这就会导致<strong>两个distribution的overlap的部分基本能忽略为0</strong></p>
+<p><div align="center">
+<img src="images/2024/08/2850269967.png" width="50%">
+</div><br>或者说，尽管实际上这两个distribution确实有重叠的部分，但是sample的不够好的话，还是会导致估测这两个distribution没有overlap。</p>
+<p><div align="center">
+<img src="images/2024/08/1114826254.png" width="50%">
+</div><br><strong>两个distribution如果没有overlap的话，那么它们的JS divergence恒为log2</strong>。因此，就算两个distribution要比另一对更加接近，使用JS divergence得到的都是一样的结果，因为<strong>这两个distribution基本不会overlap</strong>。这也就是说，model不知道怎样train，就算distribution更加接近了，model也不知道。<strong>使用binary classifier的话，正确率很容易达到100%</strong>，那么loss提供不了任何信息，根本不知道model有没有越来越好。</p>
+<p>我们可以使用<strong>Wasserstein Distance</strong>代替JS divergence。<br>想象两个distribution时两堆土，有一个推土机要将一堆土推到另一堆，移动其中一个distribution的平均距离就Wasserstein Distance。<strong>应用Wasserstein Distance的GAN叫做WGAN</strong>。<br><img src="images/2024/08/3743297587.png" alt="Wasserstein Distance"><br>如果是更复杂的distribution，那么搬运的方式会有很多。用<strong>最小的搬运平均距离</strong>来定义Wasserstein Distance。<br><img src="images/2024/08/265942251.png" alt="Wasserstein Distance"><br>这样一来看起来会比较复杂，因为还需要optimization一个搬运距离。<br>我们假设能够计算，那么此时两个distribution越来越接近的时候（虽然没有overlap），但是仍能看出区别，能说明model有在变好。<br>那么如何计算？解下面的maximum function就可以得到。<br><img src="images/2024/08/1818155286.png" alt="how to compute Wasserstein Distance"><br>它的条件简单来说就是<strong>D需要足够平滑</strong>。如果不加以限制的话，那么D会给real data无限大的正值，给generative data无限大的负值。足够平滑可以避免出现这种情况：<br><img src="images/2024/08/3868237538.png" alt=""><br>最初的WGAN做法是<strong>将parameter限制在一个范围内</strong>。但这种做法效果不太好，后面提出了改进版，使用Gradient Penalty：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1704.00028">《Improved Training of Wasserstein GANs》</a>，还有更加改进的版本：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1802.05957">《Spectral Normalization for Generative Adversarial Networks》</a>，叫做<strong>SNGAN</strong>，这个效果较好。</p>
+<p>但GAN还面临很多问题……例如，如果Generator和Discriminator其中一者不再进步，那么整个model都会停止。<br><img src="images/2024/08/3216989683.png" alt="challenge"><br>一些其他的技巧：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/soumith/ganhacks">Tips from Soumith</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1511.06434">《Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks》</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1606.03498">《Improved Techniques for Training GANs》</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1809.11096">《Large Scale GAN Training for High Fidelity Natural Image Synthesis》</a></li>
+</ul>
+<h2 id="Conditional-Generation"><a href="#Conditional-Generation" class="headerlink" title="Conditional Generation"></a>Conditional Generation</h2><p>上文提到的generator的input只是一个随机sample的vector，现在我们额外给出一个初始的$x$一起输入，产生output。一个很具体的应用就是根据文字说明生成图片，虽然输入了相同的描述，但是由于随机sample的不同，产生的图片也不同。</p>
+<p>如果用完全相同的架构去做Conditional Generation，只是加了一个input，会有一个问题：Discriminator无法判断Generator的output是否和$x$是有关的。因此，我们需要<strong>额外设计一个模块需要判断Generator的outpuut是否和$x$匹配</strong>。要训练这个模块，我们需要<strong>真实资料和标签配对的训练资料</strong>，还需要一些<strong>真实资料和标签不配对的训练资料</strong>，用来告诉Generator这是错误的。<br>一篇Conditional GAN的paper：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1605.05396">《Generative Adversarial Text to Image Synthesis》</a><br>图片转换的paper：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1611.07004">《Image-to-Image Translation with Conditional Adversarial Networks》</a>。paper有写到：GAN+supervised效果最好。<br>甚至可以语音转图片：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1808.04108">《Towards Audio to Scene Image Synthesis using Generative Adversarial Network》</a><br>让机器产生动图：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1905.08233">《Few-Shot Adversarial Learning of Realistic Neural Talking Head Models》</a></p>
+<h2 id="use-GAN-in-unsupervised-learning——Cycle-GAN"><a href="#use-GAN-in-unsupervised-learning——Cycle-GAN" class="headerlink" title="use GAN in unsupervised-learning——Cycle GAN"></a>use GAN in unsupervised-learning——Cycle GAN</h2><p>如果完全没有成对匹配的资料（例如影像风格转换，真人转二次元），那么如何使用GAN学习呢？<br>完全套用前面写到的架构，Generator产生的图片可能和input没有关系。不管你输入什么，产生的就是一个随机的二次元人物，但和输入的真人没有什么特别的关系。<br>解决方法为：假设真人图片属于$x domain$，二次元图片输入$y domain$我们设置<strong>两个Generator</strong>，第一个Generator会将$x domain$转化为$y domain$，第二个Generator会将$y domain$转化为$x domain$，只要比较input的$x domain$的vector和最后产生的$x domain$的vector，其越接近越好。这组成了一个循环，因此叫Cycle GAN。<br><img src="images/2024/08/1407199455.png" alt="Cycle GAN"><br>这样做能够使得input和generative的结果<strong>有一定的关系</strong>。但我们无法保证这个关系是我们想要的（比如眼镜会变成一个痣），实际操作的时候，<strong>机器是非常懒惰的</strong>，它大概率不会去做一些奇怪的转换，也就是说，它更倾向于不去改变眼镜的样子，眼镜还是眼镜，所以这个问题不需要太担心。<br>一些其他的类似的GAN：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1703.05192">《Learning to Discover Cross-Domain Relations with Generative Adversarial Networks》</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1704.02510">《DualGAN: Unsupervised Dual Learning for Image-to-Image Translation》</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1703.10593">《Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks》</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1711.09020">《StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation》</a></li>
+<li><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1907.10830">《U-GAT-IT: Unsupervised Generative Attentional Networks with Adaptive Layer-Instance Normalization for Image-to-Image Translation》</a>，其网站<a target="_blank" rel="noopener" href="https://selfie2anime.com/">selfie2anime</a><br>另外，还可以做文字转换（例如将坏话转换成好话）<br><img src="images/2024/08/2856423426.png" alt="some example"><h2 id="Evaluation-of-Generation"><a href="#Evaluation-of-Generation" class="headerlink" title="Evaluation of Generation"></a>Evaluation of Generation</h2>仅凭人的直觉来判断结果的好坏显然是不合理的。一种方法是：设置一个影像分类系统，输入GAN产生的图片，然后输出一个概率分布，这个概率分布<strong>越集中越好</strong>。直观理解就是，影响辨识系统很确定这张图片是什么，说明结果很好。<br><img src="images/2024/08/1093908052.png" alt=""></li>
+</ul>
+<p>但用这种方法，会遇到<strong>Model collapse</strong>的问题。简单来说，就是机器只学习到<strong>产生一种类似的图片</strong>，即大部分图片都是相似的。<br><img src="images/2024/08/163771772.png" alt="Model Collapse"><br>还有一个问题：<strong>Model Dropping</strong>。这种问题表现为：多样性足够，但只学习到了train data中的一部分内容。这个问题很难被侦测到。<br><img src="images/2024/08/1652356998.png" alt="Model Dropping"><br>那么还有一种方法，在一定程度上可以解决上述问题，判断结果的好坏。将<strong>一批图片放到分类器中，得到每个图片的distribution，然后将所有distribution平均</strong>。如果结果很集中，代表多样性差；如果结果分布很平均，代表多样性好。可以用<strong>Inception Score(IS)</strong>表示结果的好坏。<br><img src="images/2024/08/2974453781.png" alt="Inception Score"><br>但IS不适用于人脸图片生成，因为即使发色、眼睛不同，但终归都是人脸，因此可能IS判断的多样性也较小。我们可以使用Fréchet Inception Distance (FID)。<br>我们取出output layer的softmax前的一层输出vector，按理说是一个distribution，然后计算其和train data的distribution的距离，距离越小越好。<br><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.08500">《GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium》</a><br>但有些时候，Generator可能只是将train data sample一些出来，或者将train data翻转一下，就又出现了一个问题。这说明，GAN遇到的问题还是非常多的。下面这篇paper介绍了多种评估GAN的方法：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1511.01844">《A note on the evaluation of generative models<br>》</a><br>一篇介绍了不同GAN效果对比的paper：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1711.10337">《Are GANs Created Equal? A Large-Scale Study》</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/week6-Generation.html" data-id="cm4zg7wzf000wwe3kfmui64x7" data-title="[week6]Generation" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/week7-Self-supervised-Learning-in-NLP.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [week7]Self-supervised Learning in NLP
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/week5-extra-Batch-Normalization.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[week5 extra]Batch Normalization</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

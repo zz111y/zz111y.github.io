@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[Week1 Extra] 用Logistic Regression实现classification | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Generative Model假设有两个类别class1和class2，从class1中抽取一个样本的概率为$P(C_1)$，从class2中抽取一个样本的概率为$P(C_2)$。现给定一个x，求其属于哪个class，即求$P(C_1|x)$或$P(C_2|x)$（posterior probability）。根据Bayes公式，有：  P(C_1|x)&#x3D;\frac{P(x|C_1)P(C_1)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Week1 Extra] 用Logistic Regression实现classification">
+<meta property="og:url" content="https://zz111y.github.io/articles/Week1-Extra-%E7%94%A8Logistic-Regression%E5%AE%9E%E7%8E%B0classification.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="Generative Model假设有两个类别class1和class2，从class1中抽取一个样本的概率为$P(C_1)$，从class2中抽取一个样本的概率为$P(C_2)$。现给定一个x，求其属于哪个class，即求$P(C_1|x)$或$P(C_2|x)$（posterior probability）。根据Bayes公式，有：  P(C_1|x)&#x3D;\frac{P(x|C_1)P(C_1)">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/600706388.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/1038336687.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3596427211.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/1410495640.png">
+<meta property="article:published_time" content="2024-07-15T05:14:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:41:31.380Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/07/600706388.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Week1-Extra-用Logistic-Regression实现classification" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/Week1-Extra-%E7%94%A8Logistic-Regression%E5%AE%9E%E7%8E%B0classification.html" class="article-date">
+  <time class="dt-published" datetime="2024-07-15T05:14:00.000Z" itemprop="datePublished">2024-07-15</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [Week1 Extra] 用Logistic Regression实现classification
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="Generative-Model"><a href="#Generative-Model" class="headerlink" title="Generative Model"></a>Generative Model</h1><p>假设有两个类别class1和class2，从class1中抽取一个样本的概率为$P(C_1)$，从class2中抽取一个样本的概率为$P(C_2)$。现<strong>给定一个x</strong>，求其属于哪个class，即求$P(C_1|x)$或$P(C_2|x)$（<strong>posterior probability</strong>）。<br><strong>根据Bayes公式</strong>，有：</p>
+<script type="math/tex; mode=display">
+P(C_1|x)=\frac{P(x|C_1)P(C_1)}{P(x|C_1)P(C_1)+P(x|C_2)P(C_2)}</script><p>其中$P(C_1)$和$P(C_2)$叫做<strong>Prior</strong>；$P(x|C_1)$为$C_1$产生$x$的概率，$P(x|C_2)$为$C_2$产生$x$的概率。如果$P(C_1|x)&gt;0.5$，则代表这个$x$属于$C_1$；反之则属于$C_2$。</p>
+<p>在这个公式中，$P(C_1)$和$P(C_1)$都是非常容易求得的，重点在于$P(x|C_1)$和$P(x|C_2)$。下面我们<strong>假设$C_1$和$C_2$都是从一个Gaussion Distribution中sample出来的</strong>。<br>[scode type=”share”]<strong>Gaussion Ditribution</strong></p>
+<script type="math/tex; mode=display">
+f_{\mu,\Sigma}(x)=\frac{1}{(2\pi)^{(D/2)}}\frac{1}{|\Sigma|^{(1/2)}}exp\{-\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)\}</script><p>其中$\mu$为样本mean，$\Sigma$为样本covariance matrix[/scode]<br>只要我们找到了这样的一个Gaussion Ditribution，然后将$x$的代入概率密度函数，即可得到$P(x|C_1)$和$P(x|C_2)$。</p>
+<h2 id="Maximum-Likelihood"><a href="#Maximum-Likelihood" class="headerlink" title="Maximum Likelihood"></a>Maximum Likelihood</h2><p>那么如何找到它的密度函数呢？使用<strong>Maximum Likelihood</strong>的方法。<br>一个mean为$\mu$、covariance matrix为$\Sigma$的Gaussion Distribution的Likelihood为<strong>它sample出$x^1,x^2,…,x^N$的概率</strong>。我们用$L(\mu,\Sigma)$来表示Likelihood，有：</p>
+<script type="math/tex; mode=display">
+L(\mu,\Sigma)=f_{\mu,\Sigma}(x^1)f_{\mu,\Sigma}(x^2)...f_{\mu,\Sigma}(x^N)</script><p>那么我们要找到$\mu^<em>,\Sigma^</em>$，使得$L(\mu,\Sigma)$最大，即：</p>
+<script type="math/tex; mode=display">
+\mu^*,\Sigma^*=\mathop{\arg\max}\limits_{\mu,\Sigma}L(\mu,\Sigma)</script><p>最终解为：</p>
+<script type="math/tex; mode=display">
+\mu^*=\frac{1}{N}\sum\limits_{n=1}^Nx^n</script><script type="math/tex; mode=display">
+\Sigma^*=\frac{1}{N}\sum\limits_{n=1}^N(x^n-\mu^*)(x^n-\mu^*)^T</script><p>那么此时，将$x$分别代入class1和class2的密度函数，即可得到$P(x|C_1)$和$P(x|C_2)$：</p>
+<script type="math/tex; mode=display">
+P(x|C_1)=f_{\mu^1,\Sigma^1}(x)=\frac{1}{(2\pi)^{(D/2)}}\frac{1}{|\Sigma^1|^{(1/2)}}exp\{-\frac{1}{2}(x-\mu^1)^T(\Sigma^1)^{-1}(x-\mu^1)\}</script><script type="math/tex; mode=display">
+P(x|C_2)=f_{\mu^2,\Sigma^2}(x)=\frac{1}{(2\pi)^{(D/2)}}\frac{1}{|\Sigma^2|^{(1/2)}}exp\{-\frac{1}{2}(x-\mu^2)^T(\Sigma^2)^{-1}(x-\mu^2)\}</script><p>实际使用中，往往<strong>多个class的Gaussion Distribution采用相同的$\Sigma$</strong>，因为covariance matrix的元素个数是class feature数量的平方，当feature较多时，如果采用不同的covariance matirx，会使得parameter数量增长非常快，<strong>容易导致over fitting</strong>。<br>这时，计算Likelihood的方法为：</p>
+<script type="math/tex; mode=display">
+L(\mu^1,\mu^2,\Sigma)=f_{\mu^1,\Sigma}(x^1)f_{\mu^1,\Sigma}(x^2)...f_{\mu^1,\Sigma}(x^k)+f_{\mu^2,\Sigma}(x^{k+1})f_{\mu^2,\Sigma}(x^{k+2})...f_{\mu^2,\Sigma}(x^N)</script><p>其中$x^1,x^2,…,x^k$来自class1；$x^{k+1},x^{k+2},…,x^N$来自class2。<br>此时$\mu^<em>$的算法同上，$\Sigma^</em>$的解为：</p>
+<script type="math/tex; mode=display">
+\Sigma^*=\frac{k}{N}\Sigma^1+\frac{N-k}{N}\Sigma^2</script><p><strong>这样得到的两个class的boundary是linear的</strong>，而使用不同的covariance matrix得到的boundary是non-linear的。</p>
+<p>以上计算以Gaussion Distribution为例，但实际使用中需要根据背景选择合适的distribution。例如如果<strong>某一个feature是binary</strong>的，那么就应该选择Bernoulli distribution；如果<strong>所有dimension都是独立产生</strong>的，那么就应该选择Naive Bayes Classifier。</p>
+<h2 id="对于Posterior-Probability的思考"><a href="#对于Posterior-Probability的思考" class="headerlink" title="对于Posterior Probability的思考"></a>对于Posterior Probability的思考</h2><p>我们对Posterior Probability的计算公式进行进一步推导：</p>
+<script type="math/tex; mode=display">
+P(C_1|x)=\frac{P(x|C_1)P(C_1)}{P(x|C_1)P(C_1)+P(x|C_2)P(C_2)}</script><script type="math/tex; mode=display">
+=\frac{1}{1+\frac{P(x|C_2)P(C_2)}{P(x|C_1)P(C_1)}}=\frac{1}{1+exp(-z)}=\sigma(z)</script><p>其中：</p>
+<script type="math/tex; mode=display">
+z=ln\frac{P(x|C_1)P(C_1)}{P(x|C_2)P(C_2)}=ln\frac{P(x|C_1)}{P(x|C_2)}+ln\frac{P(C_1)}{P(C_2)}</script><p>有：</p>
+<script type="math/tex; mode=display">
+\frac{P(C_1)}{P(C_2)}=\frac{\frac{N_1}{N_1+N_2}}{\frac{N_2}{N_1+N_2}}=\frac{N_1}{N_2}</script><script type="math/tex; mode=display">
+P(x|C_1)=f_{\mu^1,\Sigma^1}(x)=\frac{1}{(2\pi)^{(D/2)}}\frac{1}{|\Sigma^1|^{(1/2)}}exp\{-\frac{1}{2}(x-\mu^1)^T(\Sigma^1)^{-1}(x-\mu^1)\}</script><script type="math/tex; mode=display">
+P(x|C_2)=f_{\mu^2,\Sigma^2}(x)=\frac{1}{(2\pi)^{(D/2)}}\frac{1}{|\Sigma^2|^{(1/2)}}exp\{-\frac{1}{2}(x-\mu^2)^T(\Sigma^2)^{-1}(x-\mu^2)\}</script><p>那么可以得到：</p>
+<script type="math/tex; mode=display">
+ln\frac{P(x|C_1)}{P(x|C_2)}=ln\frac{|\Sigma^2|^{1/2}}{|\Sigma^1|^{1/2}}-\frac{1}{2}[(x-\mu^1)^T(\Sigma^1)^{-1}(x-\mu^1)-(x-\mu^2)^T(\Sigma^2)^{-1}(x-\mu^2)]</script><p>展开后代入$z$得：</p>
+<script type="math/tex; mode=display">
+z=ln\frac{|\Sigma^2|^{1/2}}{|\Sigma^1|^{1/2}}-\frac{1}{2}x^T(\Sigma^1)^{-1}+(\mu^1)^T(\Sigma^1)^{-1}x-\frac{1}{2}(\mu^1)^T(\Sigma^1)^{-1}\mu^1</script><script type="math/tex; mode=display">
++\frac{1}{2}x^T(\Sigma^2)^{-1}-(\mu^2)^T(\Sigma^2)^{-1}x+\frac{1}{2}(\mu^2)^T(\Sigma^2)^{-1}\mu^2+ln\frac{N_1}{N_2}</script><p>在我们取相同的covariance matrix的情况下，上式可以化简为：</p>
+<script type="math/tex; mode=display">
+z=(\mu^1)^T(\Sigma^1)^{-1}x-\frac{1}{2}(\mu^1)^T(\Sigma^1)^{-1}\mu^1-(\mu^2)^T(\Sigma^2)^{-1}x+\frac{1}{2}(\mu^2)^T(\Sigma^2)^{-1}\mu^2+ln\frac{N_1}{N_2}</script><p>进一步化简为：</p>
+<script type="math/tex; mode=display">
+z=(\mu^1-\mu^2)^T\Sigma^{-1}x-\frac{1}{2}(\mu^1)^T(\Sigma^1)^{-1}\mu^1+\frac{1}{2}(\mu^2)^T(\Sigma^2)^{-1}\mu^2+ln\frac{N_1}{N_2}</script><p>我们将$(\mu^1-\mu^2)^T\Sigma^{-1}$记作$W^T$，由于$-\frac{1}{2}(\mu^1)^T(\Sigma^1)^{-1}\mu^1+\frac{1}{2}(\mu^2)^T(\Sigma^2)^{-1}\mu^2+ln\frac{N_1}{N_2}$是一个scalar，记作$b$。于是我们得到了最终的表达式：</p>
+<script type="math/tex; mode=display">
+P(C_1|x)=\sigma(w\cdot x+b)</script><p>从这里也能看出，为什么共用$\Sigma$的时候，boundary是linear的。</p>
+<hr>
+<p>上述Classification叫做<strong>Generative Model</strong>。在Generative Model中，我们会计算$N_1,N_2,\mu^1,\mu^2,\Sigma$，得到结果后，代入上式，即可得到结果。</p>
+<h1 id="Discriminative-Model"><a href="#Discriminative-Model" class="headerlink" title="Discriminative Model"></a>Discriminative Model</h1><h2 id="Two-class-Classification"><a href="#Two-class-Classification" class="headerlink" title="Two-class Classification"></a>Two-class Classification</h2><p>上文我们最后总结了Posterior Probability的表达式：</p>
+<script type="math/tex; mode=display">
+P(C_1|x)=\sigma(w\cdot x+b)</script><p>并且用数学推导的方式得到了最终结果，下文我们将使用Gradient Descent方法求解。<br>给出如下training data：<br>|$x^1$|$x^2$|$x^3$|…|$x^N$|<br>|:-:|:-:|:-:|:-:|:-:|<br>|$C_1$|$C_1$|$C_2$|…|$C_1$|</p>
+<p><strong>training data的形式为：$(x^n,\hat{y}^n$，其中$\hat{y}^n=1$代表其属于$C_1$，$\hat{y}^n=0$代表其属于$C_2$。</strong><br>我们假设这组data是基于$f_{w,b}=P_{w,b}(C_1|x)$产生的，现在要找到一组$w,b$，使得其最有可能产生这组data。<br>根据Generative Model的学习，我们可以定义Likelihood函数：</p>
+<script type="math/tex; mode=display">
+L(w,b)=f_{w,b}(x^1)f_{w,b}(x^2)(1-f_{w,b}(x^1))...f_{w,b}(x^N)</script><p>我们要求：</p>
+<script type="math/tex; mode=display">
+w^*,b^*=\mathop{\arg\max}\limits_{w,b}L(w,b)</script><p>对其进行变形，可得：</p>
+<script type="math/tex; mode=display">
+w^*,b^*=\mathop{\arg\min}\limits_{w,b}-lnL(w,b)</script><p>进一步推导，得到：</p>
+<script type="math/tex; mode=display">
+-lnL(w,b)=-lnf_{w,b}(x^1)-lnf_{w,b}(x^2)-ln(1-f_{w,b}(x^1))-...</script><script type="math/tex; mode=display">
+=-[\hat{y^1}lnf(x^1)+(1-\hat{y^1})ln(1-f(x^1))]-[\hat{y^2}lnf(x^2)+(1-\hat{y^2})ln(1-f(x^2))]</script><script type="math/tex; mode=display">
+-[\hat{y^3}lnf(x^3)+(1-\hat{y^3})ln(1-f(x^3))]-...</script><p>即：</p>
+<script type="math/tex; mode=display">
+-lnL(w,b)=\sum\limits_n-[\hat{y^n}lnf_{w,b}(x^n)+(1-\hat{y^n})ln(1-f_{w,b}(x^n))]</script><p>综上所述，我们定义了Model：$f_{w,b}(x)=\sigma(\sum\limits_iw_ix_i+b)=\frac{1}{1+exp(-z)}$，其中$z=wx+b=\sum\limits_iw_ix_i+b$。然后，我们可以使用Gradient Descent对其进行Optimization。接下来求解$\frac{\partial -lnL(w,b)}{\partial w_i}$：</p>
+<script type="math/tex; mode=display">
+\frac{-lnL(w,b)}{\partial w_i}=\sum\limits_n-[\hat{y^n}\frac{lnf_{w,b}(x^n)}{\partial w_i}+(1-\hat{y^n})\frac{ln(1-f_{w,b}(x^n))}{\partial w_i}]</script><p>其中：</p>
+<script type="math/tex; mode=display">
+\frac{lnf_{w,b}(x^n)}{\partial w_i}=\frac{\partial lnf_{w,b}(x^n)}{\partial z}\frac{\partial z}{\partial w_i}</script><p>而：</p>
+<script type="math/tex; mode=display">
+\frac{\partial lnf_{w,b}(x^n)}{\partial z}=\frac{1}{\sigma(z)}\frac{\partial\sigma(z)}{\partial z}=\frac{1}{\sigma(z)}\sigma(z)(1-\sigma(z))</script><script type="math/tex; mode=display">
+\frac{\partial z}{\partial w_i}=x_i</script><p>则：</p>
+<script type="math/tex; mode=display">
+\frac{\partial lnf_{w,b}(x^n)}{\partial z}=\frac{\partial lnf_{w,b}(x^n)}{\partial z}\frac{\partial z}{\partial w_i}=(1-f(x^n))x_i^n</script><p>同理可求得：</p>
+<script type="math/tex; mode=display">
+\frac{ln(1-f_{w,b}(x^n))}{\partial w_i}=f(x^n)x_i^n</script><p>最后，将其代入原式，得到：</p>
+<script type="math/tex; mode=display">
+\frac{-lnL(w,b)}{\partial w_i}=\sum\limits_n-(\hat{y}^n-f_{w,b}(x^n))x_i^n</script><p>至此，我们得到了<strong>Gradient Descent</strong>的公式：</p>
+<script type="math/tex; mode=display">
+w_i=w_i-\eta\sum\limits_n-(\hat{y}^n-f_{w,b}(x^n))x_i^n</script><p>从式子中观察知：<strong>$\hat{y}^n$和$f_{w,b}(x^n))x_i^n$的差距越大，则更新的就越大</strong>。<br>[scode type=”yellow”]对于Logistic Regression，应使用<strong>cross entropy</strong>作为Loss，使用Square Error效果不好。[/scode]</p>
+<hr>
+<p>上面的Model叫做<strong>Discriminative Model</strong>，同<strong>Generative Model</strong>相比，虽然其使用的是同一个function set，但最终会得到不同的$w,b$。</p>
+<p>Generative Model的优势：</p>
+<ul>
+<li>With the assumption of probability distribution,<strong>less training data</strong> is needed;</li>
+<li>With the assumption of probability distribution,more robust to the noise;</li>
+<li>Priors and class-dependent probability can be estimated from different source.（Discriminative Model首先假设一个概率分布，然后直接找到其中的parameters；而Generative Model将整个过程拆分为Priors和class-dependent probability，可以分别求解。例如在语音辨识中，Priors可以由文字data得到，class-dependent probability需要结合文字data和语音data得到）。</li>
+</ul>
+<h2 id="Multi-class-Classification"><a href="#Multi-class-Classification" class="headerlink" title="Multi-class Classification"></a>Multi-class Classification</h2><p>以三个类别$C_1,C_2,C_3$为例，其中$C_1$对应parameters为$w^1,b^1$，$C_2$对应parameters为$w^2,b^2$，$C_3$对应parameters为$w^3,b^3$。给定一个$x$，有：</p>
+<script type="math/tex; mode=display">
+z_1=w^1\cdot x+b^1</script><script type="math/tex; mode=display">
+z_2=w^2\cdot x+b^2</script><script type="math/tex; mode=display">
+z_3=w^3\cdot x+b^3</script><p>然后将output经过一个<strong>softmax</strong>：<br><img src="images/2024/07/600706388.png" alt="softmax"><br>将softmax的output与traning data的label做Cross Entropy，得到：<br><img src="images/2024/07/1038336687.png" alt="Cross Entropy"><br>其中，如果$x∈C_1$，y=$\begin{bmatrix}1 \ 0 \ 0\end{bmatrix}$；如果$x∈C_2$，y=$\begin{bmatrix}0 \ 1 \ 0\end{bmatrix}$；如果$x∈C_3$，y=$\begin{bmatrix}0 \ 0 \ 1\end{bmatrix}$。</p>
+<h1 id="Limitation-of-Logistic-Regression"><a href="#Limitation-of-Logistic-Regression" class="headerlink" title="Limitation of Logistic Regression"></a>Limitation of Logistic Regression</h1><p>以二分类为例，其boundary是一条直线。考虑如下例子：<br><img src="images/2024/07/3596427211.png" alt=""><br>Logistic Regression无法合理的区分这两个Class。因为样本点不是<strong>线性可分的</strong>。<br>解决方法：Feature Transformation(Cascading Logistic Regression Model)<br>如下图所示：<br><img src="images/2024/07/1410495640.png" alt="Feature Transformation"><br>通过Feature Transformation，可以将原来线性不可分的样本点转化为<strong>线性可分的</strong>，然后就能使用Logistic Regression进行classification了。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/Week1-Extra-%E7%94%A8Logistic-Regression%E5%AE%9E%E7%8E%B0classification.html" data-id="cm4zf9dd40001y73kfl9304as" data-title="[Week1 Extra] 用Logistic Regression实现classification" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/HW-1-Regreesion.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [HW 1]Regreesion
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/Week1-extra-Backpropogation.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[Week1 extra] Backpropogation</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

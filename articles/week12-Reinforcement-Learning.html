@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[week12]Reinforcement Learning | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="What is RLRL也是ML的一种，因此其本质也是找一个function。在RL中，有一个actor和一个environment，environment给actor一个observation，actor根据observation产生一个action，此action会影响environment，同时environment会给actor一个reward来判断此action的好坏。而我们要找的fun">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[week12]Reinforcement Learning">
+<meta property="og:url" content="https://zz111y.github.io/articles/week12-Reinforcement-Learning.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="What is RLRL也是ML的一种，因此其本质也是找一个function。在RL中，有一个actor和一个environment，environment给actor一个observation，actor根据observation产生一个action，此action会影响environment，同时environment会给actor一个reward来判断此action的好坏。而我们要找的fun">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/232325698.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2686095016.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/1212833890.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3454436464.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2951333223.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/962072055.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3680080204.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2585770038.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/901892879.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3283872722.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2615272301.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2644928230.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2957617261.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3866885262.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/2143147530.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/3865662053.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/4095645685.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/10/1827051017.png">
+<meta property="article:published_time" content="2024-10-03T16:43:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T10:10:28.353Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/10/232325698.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-week12-Reinforcement-Learning" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/week12-Reinforcement-Learning.html" class="article-date">
+  <time class="dt-published" datetime="2024-10-03T16:43:00.000Z" itemprop="datePublished">2024-10-04</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [week12]Reinforcement Learning
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="What-is-RL"><a href="#What-is-RL" class="headerlink" title="What is RL"></a>What is RL</h1><p>RL也是ML的一种，因此其本质也是找一个function。<br>在RL中，有一个actor和一个environment，environment给actor一个observation，actor根据observation产生一个action，此action会影响environment，同时environment会给actor一个reward来判断此action的好坏。而我们要找的function其实就是actor，目标是maximize reward。<br><img src="images/2024/10/232325698.png" alt="RL"></p>
+<p>由于我们说RL也是ML的一种，那么实现的流程自然有三步：</p>
+<ol>
+<li><strong>Function with Unknown</strong><br>Actor就是一个Policy Network，它的input是observation，output是action。<br><img src="images/2024/10/2686095016.png" alt="Policy Network"></li>
+<li><strong>Define “Loss”</strong><br>假如在玩space invader，那么经过很多个turns后游戏结束，从游戏开始到结束的整个过程叫做一个episode，这中间会得到很多reward，Total reward(R,or return)就是reward的总和：<script type="math/tex; mode=display">R=\sum\limits_{t=1}^Tr_t</script>我们的目标就是maximize这个R，如果给他加个负号，那就可以是loss了。</li>
+<li><strong>Optimization</strong><br>整个流程是一个observation产生一个action，此action影响env产生另一个observation…以此类推，整个流程可以看做一个observation和action的sequence，记作$\tau$。而我们要optimize的就是每一组observation和action对应得到的reward之和。<br><img src="images/2024/10/1212833890.png" alt=""><br>实际上要面临的问题有很多，首先actor是<strong>sample出来的</strong>，说明这个大network的某个layer是随机的；另外，env和reward根本就<strong>不是network</strong>，他们都更像一个blackbox；更糟糕的是，reward和env都是带有<strong>随机性</strong>的。<br>因此，<strong>RL真正的crux在于如何Optimization</strong>。</li>
+</ol>
+<h1 id="Policy-Gradient"><a href="#Policy-Gradient" class="headerlink" title="Policy Gradient"></a>Policy Gradient</h1><h2 id="How-to-control-your-actor"><a href="#How-to-control-your-actor" class="headerlink" title="How to control your actor"></a>How to control your actor</h2><p>当actor遇到某个observation $s$的时候，你想要让actor采取某个特定的action $\hat a$，或者遇到$s\prime$的时候，你想要让actor不采取某个action $\hat a\prime$（可以采取任何其他action），可以采取以下策略：<br><img src="images/2024/10/3454436464.png" alt="control your actor"><br>其中$e$是cross-entropy。由此我们就可以得到一种Loss的定义方式：<br><img src="images/2024/10/2951333223.png" alt=""><br>当然可以更进一步的修改，原本的是<strong>要执行-不要执行</strong>的binary classify的问题，我们可以定义更加细化的expect：<br><img src="images/2024/10/962072055.png" alt=""><br>这样做的难点在于如何确定$A$的值以及如何得到Training Data。</p>
+<h2 id="Loss-Version0"><a href="#Loss-Version0" class="headerlink" title="Loss Version0"></a>Loss Version0</h2><p>随机初始化一个actor，让他去env中实践一下，得到一系列的observation、action和reward，直接用reward当做A的值：<br><img src="images/2024/10/3680080204.png" alt="version0"><br>但是这样做，完全没有考虑全局，而只是考虑了当前这一步的reward。因此这样做的效果并不好。并且，<strong>牺牲当下利益获取长远利益</strong>也是很重要的，而这种做法完全不会考虑这种情况。</p>
+<h2 id="Version1"><a href="#Version1" class="headerlink" title="Version1"></a>Version1</h2><p>改进一下，加上全局的考虑，可以累加当前action后所有的reward作为评估标准，我们将cumulated reward记作G：<br><img src="images/2024/10/2585770038.png" alt="version1"><br>但这样，越靠前的action就会积累到更大的reward，这明显不太合理。</p>
+<h2 id="Version2"><a href="#Version2" class="headerlink" title="Version2"></a>Version2</h2><p>我们给cumulated reward加上一个discount factor：<br><img src="images/2024/10/901892879.png" alt="version2"></p>
+<h2 id="Version3"><a href="#Version3" class="headerlink" title="Version3"></a>Version3</h2><p>好坏是相对的，因此我们要对G进行normalization：<br><img src="images/2024/10/3283872722.png" alt="version3"></p>
+<h2 id="policy-gradient"><a href="#policy-gradient" class="headerlink" title="policy gradient"></a>policy gradient</h2><p>有了Optimization的目标后，那么就能做Gradient Descent了：<br><img src="images/2024/10/2615272301.png" alt="policy gradient"><br>我们发现，收集training data是在for循环里进行的，因此每次迭都需要data collection，这是<strong>非常花时间</strong>的。<br>[scode type=”yellow”]同一批action data，对于不同的actor parameters效果是不同的，因此需要不停的搜集新的data。[/scode]<br>[scode type=”green”]搜集资料的时候，要有一定的exploration，即actor会采取更加随机的action，这样做能让actor尝试更多的可能。[/scode]</p>
+<h2 id="On-policy-v-s-Off-policy"><a href="#On-policy-v-s-Off-policy" class="headerlink" title="On-policy v.s. Off-policy"></a>On-policy v.s. Off-policy</h2><p>上面讲到的<strong>要训练的actor</strong>与<strong>和env互动的actor</strong>是同一个actor，叫做<strong>on-policy</strong>，如果二者是不同的actor，那么叫做<strong>off-policy</strong>。off-policy的好处是：<strong>可以减少收集资料的次数</strong>。<br>一个常用的off-policy的方法：<a target="_blank" rel="noopener" href="https://www.youtube.com/watch?v=OAKAZhFmYoI">PPO</a></p>
+<h1 id="Actor-Critic"><a href="#Actor-Critic" class="headerlink" title="Actor-Critic"></a>Actor-Critic</h1><p>critic的含义即<strong>给定一个observing s，某个actor $\theta$的好坏</strong>。<br>以value function$V^\theta(s)$举例，给定一个actor和一个obeservation，它能“未卜先知”预测cumulated reward。<br>实际上，$V^\theta(s)$是一个network，我们需要去训练他。</p>
+<h2 id="How-to-estimate-V-theta-s"><a href="#How-to-estimate-V-theta-s" class="headerlink" title="How to estimate $V^\theta(s)$"></a>How to estimate $V^\theta(s)$</h2><ul>
+<li><strong>Monte-Carlo(MC)</strong> based approach<br>直接使用actor的cumulated reward $G_a$作为训练资料去训练value function。这种方法需要整个流程结束才能得到训练资料。<br>MC的variance很大，因为$G_a$是有随机性的，所以每次得到的$G_a$的差别就会很大</li>
+<li><strong>Temporal-difference(TD)</strong> approach<br>相较于MC，TD方法不需要走完整个流程，TD只需要$s_t,a_t,r_t,s_{t+1}$即可估测cumulated reward。<br>我们假设$\gamma=1$，由于：<script type="math/tex; mode=display">
+V^\theta(s_t)=r_t+\gamma r_{t+1}+\gamma^2r_{t+2}+...</script><script type="math/tex; mode=display">
+V^\theta(s_{t+1})=r_{t+1}+\gamma r_{t+2}+...</script>可得：<script type="math/tex; mode=display">
+V^\theta(s_t)=\gamma V^\theta(s_{t+1})+r_t</script>那么训练value function即：使得$V^\theta(s_t)-\gamma V^\theta(s_{t+1})$和$r_t$越接近越好。<br>TD中，有随机性的是$r$，但$r$的variance比$G_a$小，因为$G_a$是很多$r$的summation。但TD中存在的问题是$V$的估测可能会不准。尽管如此，<strong>TD仍是比较常用的</strong>。</li>
+</ul>
+<p>[scode type=”blue”]两种方法最大的区别在于：<br>MC会假设$s_a,s_b$之间存在某种关系，即$s_a$会影响$s_b$<br>TD会假设$s_a,s_b$并不存在相互的影响[/scode]</p>
+<h2 id="Version3-5"><a href="#Version3-5" class="headerlink" title="Version3.5"></a>Version3.5</h2><p>在version3中，对G进行了标准化即-b，那么b要定义为多少呢？在这个version中，$b=V^\theta(s_t)$<br><img src="images/2024/10/2644928230.png" alt="version3.5"><br>这样做的道理是：由于action是sample出来的，因此$a_t$是不确定的。$G_t^\prime$是执行了$a_t$后的cumulated reward，依照上面的计算，如果$A_t&gt;0$，那么说明$a_t$比cumulated reward的期望值要大，说明这是一个好的动作；反之则是一个坏的动作。<br>但是这里有一个问题：$G_t^\prime$是一个sample，而$V^\theta(s_t)$是一个平均，用sample去减掉平均可能并不是很合理。</p>
+<h2 id="Version4"><a href="#Version4" class="headerlink" title="Version4"></a>Version4</h2><p>让上述的不合理变为合理，即用平均减去平均：<br><img src="images/2024/10/2957617261.png" alt="version4"><br>这是一个常用的方法：Advantage Actor-Critic</p>
+<h2 id="Tip-of-Actor-Critic"><a href="#Tip-of-Actor-Critic" class="headerlink" title="Tip of Actor-Critic"></a>Tip of Actor-Critic</h2><p>actor是一个network，input是observation；critic是一个network，input也是observation，既然如此，我们就能让他们<strong>共享部分parameters</strong>。<br><img src="images/2024/10/3866885262.png" alt=""></p>
+<h1 id="Reward-Shaping"><a href="#Reward-Shaping" class="headerlink" title="Reward Shaping"></a>Reward Shaping</h1><p>假设reward在绝大多数情况下都是0，只有在某种情况下才会得到一个reward（例如：下围棋），那么上述方法就会出现问题：不论采取怎样的action，得到的reward都差不多。<br>拿VizDoom（一款fps游戏）举例，<a target="_blank" rel="noopener" href="https://openreview.net/forum?id=Hk3mPK5gg&amp;noteId=Hk3mPK5gg">《Training Agent for First-Person Shooter Game with Actor-Critic Curriculum Learning》</a>进行了如下的reward shaping：<br><img src="images/2024/10/2143147530.png" alt=""><br>一个知名的做法是：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1705.05363">《Curiosity-driven Exploration by Self-supervised Prediction》</a>。简单来说就是：actor看到<strong>有意义的新鲜的东西</strong>会有reward。</p>
+<h1 id="No-Reward-Learning-From-Demonstration"><a href="#No-Reward-Learning-From-Demonstration" class="headerlink" title="No Reward:Learning From Demonstration"></a>No Reward:Learning From Demonstration</h1><p>在很多情况下，很难定义reward是什么。人为定义reward带有很强的主观性，容易出问题——引起actor很奇怪的action。</p>
+<h2 id="Imitation-Learning"><a href="#Imitation-Learning" class="headerlink" title="Imitation Learning"></a>Imitation Learning</h2><p>在没有reward情况下，可以提供一些expert的示范（每个示范是一个trajectory）用于actor学习。<br>这听起来很像supervised learning，就像机器只要复制人类的行为。但有些情况人类提供的示范并没有出现过，或者有些行为不该模仿而有些行为应该模仿，完全复制人类行为就会出现问题。<br>解决方法为：<strong>Inverse RL</strong>。基本思想为：本来不知道reward function，但可以通过expert的示范学到reward function。<br><img src="images/2024/10/3865662053.png" alt="Inverse RL"><br>其大体结构如下：<br><img src="images/2024/10/4095645685.png" alt="IRL"><br><img src="images/2024/10/1827051017.png" alt="Framework of IRL"><br>在训练机器手臂方面效果很好。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/week12-Reinforcement-Learning.html" data-id="cm4zg7wzb0008we3keqfyacfm" data-title="[week12]Reinforcement Learning" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          ubuntu环境下多版本cuda的安装与切换
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/week7-Self-supervised-Learning-in-NLP.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[week7]Self-supervised Learning in NLP</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

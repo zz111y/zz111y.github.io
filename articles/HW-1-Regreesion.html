@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[HW 1]Regreesion | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="本次HW要求使用DNN完成一个COVID19的Regression，feature包括地区、相似症状、行为、精神状态，Regression目标为检测为tested positive cases。training data给出五天的资料，testing data给出四天的资料以及第五天的feature，要Regression第五天的tested positive cases。  HW介绍：HW1 投">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[HW 1]Regreesion">
+<meta property="og:url" content="https://zz111y.github.io/articles/HW-1-Regreesion.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="本次HW要求使用DNN完成一个COVID19的Regression，feature包括地区、相似症状、行为、精神状态，Regression目标为检测为tested positive cases。training data给出五天的资料，testing data给出四天的资料以及第五天的feature，要Regression第五天的tested positive cases。  HW介绍：HW1 投">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-07-19T10:54:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:43:57.642Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-HW-1-Regreesion" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/HW-1-Regreesion.html" class="article-date">
+  <time class="dt-published" datetime="2024-07-19T10:54:00.000Z" itemprop="datePublished">2024-07-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [HW 1]Regreesion
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>本次HW要求使用DNN完成一个COVID19的Regression，feature包括地区、相似症状、行为、精神状态，Regression目标为检测为tested positive cases。training data给出五天的资料，testing data给出四天的资料以及第五天的feature，要Regression第五天的tested positive cases。</p>
+<ul>
+<li>HW介绍：<a target="_blank" rel="noopener" href="https://speech.ee.ntu.edu.tw/~hylee/ml/ml2022-course-data/HW01.pdf">HW1 投影片介绍</a>；</li>
+<li>data获取：<a target="_blank" rel="noopener" href="https://www.kaggle.com/competitions/ml2022spring-hw1/data">kaggle</a>；</li>
+<li>示例代码：<a target="_blank" rel="noopener" href="https://colab.research.google.com/drive/1FTcG6CE-HILnvFztEFKdauMlPKfQvm5Z#scrollTo=YdttVRkAfu2t">colab</a>；</li>
+</ul>
+<p>记录一下完成本次HW的总结与收获，最终在Kaggle的score为0.9左右。</p>
+<h1 id="导入必要的包"><a href="#导入必要的包" class="headerlink" title="导入必要的包"></a>导入必要的包</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"># numerical operation</span><br><span class="line">import numpy as np</span><br><span class="line">import math</span><br><span class="line"># reading/writing data</span><br><span class="line">import pandas as pd</span><br><span class="line">import os</span><br><span class="line">import csv</span><br><span class="line"># progress bar</span><br><span class="line">from tqdm import tqdm</span><br><span class="line"># pytorch</span><br><span class="line">import torch</span><br><span class="line">import torch.nn as nn</span><br><span class="line">from torch.utils.data import Dataset, DataLoader, random_split</span><br><span class="line"># plotting learning curve</span><br><span class="line">from torch.utils.Tensorboard import SummaryWriter</span><br><span class="line"></span><br><span class="line">import time</span><br><span class="line">import scipy.stats as stats</span><br></pre></td></tr></table></figure>
+<h1 id="定义一些必要的函数"><a href="#定义一些必要的函数" class="headerlink" title="定义一些必要的函数"></a>定义一些必要的函数</h1><h2 id="固定随机数种子"><a href="#固定随机数种子" class="headerlink" title="固定随机数种子"></a>固定随机数种子</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def same_seed(seed):</span><br><span class="line">    torch.backends.cudnn.deterministic = True</span><br><span class="line">    torch.backends.cudnn.benchmark = False</span><br><span class="line">    np.random.seed(seed)</span><br><span class="line">    torch.manual_seed(seed)</span><br><span class="line">    if torch.cuda.is_available():</span><br><span class="line">        torch.cuda.manual_seed_all(seed)</span><br></pre></td></tr></table></figure>
+<p>其作用是确保<strong>实验的可重复性</strong>，便于<strong>复现实验结果</strong>。</p>
+<ul>
+<li>‘torch.backends.cudnn.deterministic = True’：强制cuDNN使用<strong>确定性算法</strong>，使得同样的输入会产生<strong>同样的输出</strong>；</li>
+<li>‘torch.backends.cudnn.benchmark = False’：使得cuDNN使用一种<strong>预定义的选择算法</strong>来选择合适的内核，而不是基于当前配置<strong>选择最佳内核</strong>，可以进一步确保<strong>结果的一致性</strong>，但会降低效率；</li>
+<li>‘np.random.seed(seed)’：设置<strong>numpy的随机数生成种子</strong>，使numpy生成的随机数序列是可重复的；</li>
+<li>‘torch.manual_seed(seed)’：设置<strong>PyTorch的CPU随机数生成种子</strong>，确保<strong>PyTorch在CPU上生成的随机数</strong>是可重复的；</li>
+<li>‘torch.cuda.manual_seed_all(seed)’：设置<strong>PyTorch的GPU随机数生成种子</strong>，作用类似于上。</li>
+</ul>
+<h2 id="划分train-set和valid-set"><a href="#划分train-set和valid-set" class="headerlink" title="划分train_set和valid_set"></a>划分train_set和valid_set</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def train_valid_split(data_set, valid_ratio, seed):</span><br><span class="line">    valid_set_size = int(valid_ratio * len(data_set)) </span><br><span class="line">    train_set_size = len(data_set) - valid_set_size</span><br><span class="line">    train_set, valid_set = random_split(data_set, [train_set_size, valid_set_size], generator=torch.Generator().manual_seed(seed))</span><br><span class="line">    return np.array(train_set), np.array(valid_set)</span><br></pre></td></tr></table></figure>
+<p>以<strong>valid_ratio为比例</strong>将整个train data划分为<strong>train set和valid set</strong>。在训练的时候，使用train set进行训练，并使用valid set对本次训练进行验证，目的是<strong>让模型在未见过的data上进行验证，提高模型泛化能力</strong>。这在模型训练中十分重要：</p>
+<ul>
+<li>能帮助<strong>选择最佳Model和hyperparameters</strong>；</li>
+<li>能防止Model<strong>过拟合</strong>；</li>
+<li>可以用于<strong>早停</strong>。</li>
+</ul>
+<h2 id="预测test-data"><a href="#预测test-data" class="headerlink" title="预测test data"></a>预测test data</h2><p>两种方法：</p>
+<ul>
+<li>将test data转化为<strong>tensor</strong>后feed给Model进行predict；</li>
+<li>将test data转化为<strong>DataLoader</strong>后feed给Model进行predict。</li>
+</ul>
+<p>下面介绍一下两种方法的差异：</p>
+<h3 id="直接转化为tensor"><a href="#直接转化为tensor" class="headerlink" title="直接转化为tensor"></a>直接转化为tensor</h3><p>假设将test data的有效feature提取出到一个numpy数组x_test中，由于<strong>model接收的参数是tensor</strong>，因此需要对其进行类型转化：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">test_tensor = torch.from_numpy(x_test)</span><br></pre></td></tr></table></figure><br>另外，<strong>输入tensor的数据类型要和model的parameters的类型保持一致</strong>，假设模型parameter是float（float32）类型，而numpy数组转化默认是double（float64）类型，因此需要再进行一步转化：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">test_tensor = test_tensor.float()</span><br></pre></td></tr></table></figure><br>如果是在gpu进行训练，还要进一步<strong>将tensor转移到gpu上</strong>：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">test_tensor = test_tensor.to(device)</span><br></pre></td></tr></table></figure><br>随后即可将其feed给model，得到预测结果：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pred = model(test_tensor).numpy()</span><br></pre></td></tr></table></figure><br>这样做的优点：</p>
+<ul>
+<li>代码简单；</li>
+<li>对于<strong>小型数据集</strong>，简单的步骤可以减少<strong>潜在的延迟</strong>。</li>
+</ul>
+<p>这样做的缺点：</p>
+<ul>
+<li>对于<strong>大型数据集</strong>，直接加载可能导致<strong>内存问题</strong>；</li>
+<li>不能方便的控制<strong>批大小、异步加载和数据增强</strong>。</li>
+</ul>
+<h3 id="转化为DataLoader后feed给model"><a href="#转化为DataLoader后feed给model" class="headerlink" title="转化为DataLoader后feed给model"></a>转化为DataLoader后feed给model</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def predict(test_loader, model, device):</span><br><span class="line">    model.eval()  # 将model转化为evaluate模式</span><br><span class="line">    preds = []</span><br><span class="line">    for x in tqdm(test_loader):</span><br><span class="line">        x = x.to(device)</span><br><span class="line">        with torch.no_grad():  # 禁用梯度计算</span><br><span class="line">            pred = model(x)</span><br><span class="line">            preds.append(pred.detach().cpu())</span><br><span class="line">    preds = torch.cat(preds, dim=0).numpy()  # concatenate</span><br><span class="line">    return preds</span><br></pre></td></tr></table></figure>
+<p>解释一下’preds.append(pred.detach().cpu())’：model输出的pred是一个tensor，这里的目的是将<strong>每个batch的ouput放到一个list中最后拼接为一个大的tensor</strong>。其中:</p>
+<ul>
+<li><strong>detach方法</strong>的目的是将pred<strong>从计算图中分离出来</strong>，其原因是<strong>pytorch会在训练过程中跟踪计算图</strong>，以便在<strong>Back Pass时计算梯度</strong>。而predict阶段不需要Back Pass，因此将结果分离出来可以<strong>节省内存</strong>。</li>
+<li><strong>cpu方法</strong>的目的是将pred从gpu移动到cpu。其原因是在多数情况下，模型的预测结果需要进一步保存或处理，<strong>这些操作需要在cpu上进行</strong>。另外，<strong>cpu上的数据更容易与其他库（如numpy）进行兼容</strong>。</li>
+</ul>
+<p>这样做的优点：</p>
+<ul>
+<li>适合处理<strong>大规模数据</strong>，DataLoader会<strong>分批加载数据</strong>，避免内存爆掉；</li>
+<li>DataLoader可以设置批大小和并行数据加载，<strong>提高数据处理效率</strong>。</li>
+</ul>
+<p>这样做的缺点：</p>
+<ul>
+<li>代码更加复杂；</li>
+<li>对于<strong>小型数据</strong>，其初始化和批处理可能导致<strong>微小延迟</strong>。</li>
+</ul>
+<p>鉴于本次hw的test data数量大，所以使用了后者。</p>
+<h1 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class hw1_Dataset(Dataset):</span><br><span class="line"></span><br><span class="line">    def __init__(self, x, y=None):</span><br><span class="line">        if y is None:</span><br><span class="line">            self.y = y</span><br><span class="line">        else:</span><br><span class="line">            self.y = torch.FloatTensor(y)</span><br><span class="line">        self.x = torch.FloatTensor(x)</span><br><span class="line"></span><br><span class="line">    def __getitem__(self, idx):</span><br><span class="line">        if self.y is None:</span><br><span class="line">            return self.x[idx]</span><br><span class="line">        else:</span><br><span class="line">            return self.x[idx], self.y[idx]</span><br><span class="line"></span><br><span class="line">    def __len__(self):</span><br><span class="line">        return len(self.x)</span><br></pre></td></tr></table></figure>
+<p>[scode type=”yellow”]自己的Dataset要继承pytorch里的Dataset，<strong>必须重写<strong>init</strong>、<strong>getitem</strong>、<strong>len</strong>这几个方法</strong>！[/scode]<br>由于本次hw是将test data转化为DataLoader后feed给model的，因此也需要test data的Dataset。而<strong>test data是没有y（Regression目标）的</strong>，因此对其进行了特殊处理。</p>
+<h1 id="选择feature"><a href="#选择feature" class="headerlink" title="选择feature"></a>选择feature</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">train_data = pd.read_csv(&#x27;./covid.train.csv&#x27;).values</span><br><span class="line">district = [&#x27;AL&#x27;,&#x27;AK&#x27;,&#x27;AZ&#x27;,&#x27;AR&#x27;,&#x27;CA&#x27;,&#x27;CO&#x27;,&#x27;CT&#x27;,&#x27;FL&#x27;,&#x27;GA&#x27;,&#x27;ID&#x27;,&#x27;IL&#x27;,&#x27;IN&#x27;,&#x27;IA&#x27;,&#x27;KS&#x27;,&#x27;KY&#x27;,&#x27;LA&#x27;,&#x27;MD&#x27;,&#x27;MA&#x27;,\</span><br><span class="line">       &#x27;MI&#x27;,&#x27;MN&#x27;,&#x27;MS&#x27;,&#x27;MO&#x27;,&#x27;NE&#x27;,&#x27;NV&#x27;,&#x27;NJ&#x27;,&#x27;NM&#x27;,&#x27;NY&#x27;,&#x27;NC&#x27;,&#x27;OH&#x27;,&#x27;OK&#x27;,&#x27;OR&#x27;,&#x27;RI&#x27;,&#x27;SC&#x27;,&#x27;TX&#x27;,&#x27;UT&#x27;,&#x27;VA&#x27;,&#x27;WA&#x27;]</span><br><span class="line">district_data = train_data[:,1:38]</span><br><span class="line">grouped_data = &#123;&#125;</span><br><span class="line">for i in range(train_data.shape[0]):</span><br><span class="line">    idx = np.argmax(district_data[i,:])</span><br><span class="line">    if district[idx] not in grouped_data:</span><br><span class="line">        grouped_data[district[idx]] = []</span><br><span class="line">    grouped_data[district[idx]].append(train_data[i,-1])</span><br><span class="line">h, p = stats.kruskal(*grouped_data.values())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def compute_effect_size(h, n, k):</span><br><span class="line">    return (h * (n + 1) - 2 * (k - 1)) / (n - k)</span><br><span class="line"></span><br><span class="line">n_total = sum(len(e) for e in grouped_data.values())</span><br><span class="line">k_groups = len(grouped_data)</span><br><span class="line">effect_size = compute_effect_size(h, n_total, k_groups)</span><br><span class="line">print(f&#x27;kruskal-wallis effect size &#123;effect_size&#125;&#x27;)</span><br><span class="line"></span><br><span class="line"># 选择有效feature</span><br><span class="line">feature_list = []</span><br><span class="line">p_list = []</span><br><span class="line">y = train_data[:,-1]</span><br><span class="line">for i in range(38, train_data.shape[1] - 1):</span><br><span class="line">    x = train_data[:,i]</span><br><span class="line">    corr, p = stats.spearmanr(x, y)</span><br><span class="line">    if math.fabs(corr) &gt; 0.8:  # 找到相关系数大于0.8的feature</span><br><span class="line">        feature_list.append(i)</span><br><span class="line"></span><br><span class="line">print(feature_list)</span><br></pre></td></tr></table></figure>
+<p>地区是<strong>分类变量</strong>，使用了onehot编码，这里使用了Kruskal-Wallis检验，但是偷了个懒，并没有检查合不合理，只是说<strong>这种检验可以检验分类变量和连续变量的相关性</strong>，就用了。<br>其他feature都是连续变量，用了spearman相关系数检验了一下，选择了相关系数大于0.8的feature（就是随便取了一个数…）。</p>
+<h1 id="将feature和y从data中分离出来"><a href="#将feature和y从data中分离出来" class="headerlink" title="将feature和y从data中分离出来"></a>将feature和y从data中分离出来</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def select_feature(train_data, valid_data, test_data, select_all=True):</span><br><span class="line">    &#x27;&#x27;&#x27;Selects useful features to perform regression&#x27;&#x27;&#x27;</span><br><span class="line">    y_train, y_valid = train_data[:, -1], valid_data[:, -1]</span><br><span class="line">    raw_x_train, raw_x_valid, raw_x_test = train_data[:, :-1], valid_data[:, :-1], test_data</span><br><span class="line"></span><br><span class="line">    if select_all:</span><br><span class="line">        feat_idx = list(range(raw_x_train.shape[1]))</span><br><span class="line">    else:</span><br><span class="line">        feat_idx = list(range(1, 38)) + [38, 39, 40, 41, 53, 54, 55, 56, 57, 69, 70, 71, 72, 73, 85, 86, 87, 88, 89,</span><br><span class="line">                                         101, 102, 103, 104, 105]</span><br><span class="line"></span><br><span class="line">    return raw_x_train[:, feat_idx], raw_x_valid[:, feat_idx], raw_x_test[:, feat_idx], y_train, y_valid</span><br></pre></td></tr></table></figure>
+<p>这里<strong>select_all的设计</strong>还是比较精妙的，为True就选取所有feature，为False就选取指定feature，改起来也比较方便直观。</p>
+<h1 id="定义Model"><a href="#定义Model" class="headerlink" title="定义Model"></a>定义Model</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class hw1_model(nn.Module):</span><br><span class="line">    # define model</span><br><span class="line">    def __init__(self, input_dim):</span><br><span class="line">        super(hw1_model, self).__init__()</span><br><span class="line">        self.layers = nn.Sequential(</span><br><span class="line">            nn.Linear(input_dim, 64),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(64, 8),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(8, 4),</span><br><span class="line">            nn.ReLU(),</span><br><span class="line">            nn.Linear(4, 1)</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">    def forward(self, x):</span><br><span class="line">        x = self.layers(x)</span><br><span class="line">        x = x.squeeze(1)</span><br><span class="line">        return x</span><br></pre></td></tr></table></figure>
+<p>这里就是随便设计了一个structure。</p>
+<h1 id="Hyperparameters的设置"><a href="#Hyperparameters的设置" class="headerlink" title="Hyperparameters的设置"></a>Hyperparameters的设置</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"># config:contains hyper-parameters for training and the path to save your model.</span><br><span class="line">device = &#x27;cuda&#x27; if torch.cuda.is_available() else &#x27;cpu&#x27;</span><br><span class="line">config = &#123;</span><br><span class="line">    &#x27;seed&#x27;: 5201314,</span><br><span class="line">    &#x27;select_all&#x27;: False,</span><br><span class="line">    &#x27;valid_ratio&#x27;: 0.2,</span><br><span class="line">    &#x27;n_epochs&#x27;: 3000,</span><br><span class="line">    &#x27;batch_size&#x27;: 128,</span><br><span class="line">    &#x27;learning_rate&#x27;: 1e-5,</span><br><span class="line">    &#x27;early_stop&#x27;: 400,  # 如果模型400 epoch没有优化就break</span><br><span class="line">    &#x27;save_path&#x27;: &#x27;./models/model.ckpt&#x27;,</span><br><span class="line">    &#x27;weight_decay&#x27;: 1e-3</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个设计也是非常精妙的，<strong>将所有的Hyperparameters放到一个dictionary中</strong>，方便后面调参，整个代码框架看起来也比较顺眼。</p>
+<h1 id="DataLoader"><a href="#DataLoader" class="headerlink" title="DataLoader"></a>DataLoader</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">same_seed(config[&#x27;seed&#x27;])</span><br><span class="line"></span><br><span class="line">train_data, test_data = pd.read_csv(&#x27;./covid.train.csv&#x27;).values, pd.read_csv(&#x27;./covid.test.csv&#x27;).values</span><br><span class="line">train_data, valid_data = train_valid_split(train_data, config[&#x27;valid_ratio&#x27;], config[&#x27;seed&#x27;])</span><br><span class="line"></span><br><span class="line">print(f&quot;&quot;&quot;train_data size: &#123;train_data.shape&#125;</span><br><span class="line">valid_data size: &#123;valid_data.shape&#125;</span><br><span class="line">test_data size: &#123;test_data.shape&#125;&quot;&quot;&quot;)</span><br><span class="line"></span><br><span class="line">x_train, x_valid, x_test, y_train, y_valid = select_feature(train_data, valid_data, test_data, config[&#x27;select_all&#x27;])</span><br><span class="line"></span><br><span class="line">print(f&#x27;number of features: &#123;x_train.shape[1]&#125;&#x27;)</span><br><span class="line"></span><br><span class="line">train_dataset, valid_dataset, test_dataset = hw1_Dataset(x_train, y_train), \</span><br><span class="line">    hw1_Dataset(x_valid, y_valid), \</span><br><span class="line">    hw1_Dataset(x_test)</span><br><span class="line"></span><br><span class="line">train_loader = DataLoader(train_dataset, batch_size=config[&#x27;batch_size&#x27;], shuffle=True, pin_memory=True)</span><br><span class="line">valid_loader = DataLoader(valid_dataset, batch_size=config[&#x27;batch_size&#x27;], shuffle=True, pin_memory=True)</span><br><span class="line">test_loader = DataLoader(test_dataset, batch_size=config[&#x27;batch_size&#x27;], shuffle=False, pin_memory=True)</span><br></pre></td></tr></table></figure>
+<p>这部分用来对数据进行与处理，将其包装到DataLoader中。小细节：pin_memory=True时，PyTorch会把数据加载到内存的固定位置，<strong>提高传输到gpu的效率</strong>。<br>[scode type=”yellow”]一定要注意：<strong>别把test_loader</strong>给shuffle了**，不然submission的时候会有惊喜。[/scode]</p>
+<h1 id="Training-Loop"><a href="#Training-Loop" class="headerlink" title="Training Loop"></a>Training Loop</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">def trainer(train_loader, valid_loader, model, config, device):</span><br><span class="line">    criterion = nn.MSELoss(reduction=&#x27;mean&#x27;)</span><br><span class="line"></span><br><span class="line">    optimizer = torch.optim.SGD(model.parameters(), lr=config[&#x27;learning_rate&#x27;], momentum=0.95,</span><br><span class="line">                                weight_decay=config[&#x27;weight_decay&#x27;])</span><br><span class="line"></span><br><span class="line">    writer = SummaryWriter()  # Writer of tensoboard.</span><br><span class="line"></span><br><span class="line">    if not os.path.isdir(&#x27;./models&#x27;):</span><br><span class="line">        os.mkdir(&#x27;./models&#x27;)  # Create directory of saving models.</span><br><span class="line"></span><br><span class="line">    n_epochs, best_loss, step, early_stop_count = config[&#x27;n_epochs&#x27;], math.inf, 0, 0</span><br><span class="line"></span><br><span class="line">    for epoch in range(n_epochs):</span><br><span class="line">        model.train()  # Set your model to train mode.</span><br><span class="line">        loss_record = []</span><br><span class="line"></span><br><span class="line">        # tqdm is a package to visualize your training progress.</span><br><span class="line">        train_pbar = tqdm(train_loader, position=0, leave=True)</span><br><span class="line"></span><br><span class="line">        for x, y in train_pbar:</span><br><span class="line">            optimizer.zero_grad()  # Set gradient to zero.</span><br><span class="line">            x, y = x.to(device), y.to(device)  # Move your data to device.</span><br><span class="line">            pred = model(x)</span><br><span class="line">            loss = criterion(pred, y)</span><br><span class="line">            loss.backward()  # Compute gradient(backpropagation).</span><br><span class="line">            optimizer.step()  # Update parameters.</span><br><span class="line">            step += 1</span><br><span class="line">            loss_record.append(loss.detach().item())</span><br><span class="line"></span><br><span class="line">            # Display current epoch number and loss on tqdm progress bar.</span><br><span class="line">            train_pbar.set_description(f&#x27;Epoch [&#123;epoch + 1&#125;/&#123;n_epochs&#125;]&#x27;)</span><br><span class="line">            train_pbar.set_postfix(&#123;&#x27;loss&#x27;: loss.detach().item()&#125;)</span><br><span class="line"></span><br><span class="line">        mean_train_loss = sum(loss_record) / len(loss_record)</span><br><span class="line">        writer.add_scalar(&#x27;Loss/train&#x27;, mean_train_loss, step)</span><br><span class="line"></span><br><span class="line">        model.eval()  # Set your model to evaluation mode.</span><br><span class="line">        loss_record = []</span><br><span class="line">        for x, y in valid_loader:</span><br><span class="line">            x, y = x.to(device), y.to(device)</span><br><span class="line">            with torch.no_grad():</span><br><span class="line">                pred = model(x)</span><br><span class="line">                loss = criterion(pred, y)</span><br><span class="line"></span><br><span class="line">            loss_record.append(loss.item())</span><br><span class="line"></span><br><span class="line">        mean_valid_loss = sum(loss_record) / len(loss_record)</span><br><span class="line">        print(f&#x27;Epoch [&#123;epoch + 1&#125;/&#123;n_epochs&#125;]: Train loss: &#123;mean_train_loss:.4f&#125;, Valid loss: &#123;mean_valid_loss:.4f&#125;&#x27;)</span><br><span class="line">        writer.add_scalar(&#x27;Loss/valid&#x27;, mean_valid_loss, step)</span><br><span class="line"></span><br><span class="line">        if mean_valid_loss &lt; best_loss:</span><br><span class="line">            best_loss = mean_valid_loss</span><br><span class="line">            torch.save(model.state_dict(), config[&#x27;save_path&#x27;])  # Save your best model</span><br><span class="line">            print(&#x27;Saving model with loss &#123;:.3f&#125;...&#x27;.format(best_loss))</span><br><span class="line">            early_stop_count = 0</span><br><span class="line">        else:</span><br><span class="line">            early_stop_count += 1</span><br><span class="line"></span><br><span class="line">        if early_stop_count &gt;= config[&#x27;early_stop&#x27;]:</span><br><span class="line">            print(&#x27;\nModel is not improving, so we halt the training session.&#x27;)</span><br><span class="line">            return</span><br></pre></td></tr></table></figure>
+<p>这里要注意的就是在Optimizer中加了一个L2正则化（权重衰减，weight decay），即<strong>optimizer定义中中的weight_decay部分所实现的功能</strong>。目前只了解到其是<strong>用于防止机器学习模型过拟合的一种常用技术</strong>。L2正则化<strong>通过在损失函数中增加一个正则化项来限制模型的权重大小，从而减少模型的复杂度</strong>。</p>
+<h1 id="开始训练并保存结果"><a href="#开始训练并保存结果" class="headerlink" title="开始训练并保存结果"></a>开始训练并保存结果</h1><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"># strat training</span><br><span class="line">start_time = time.time()</span><br><span class="line">model = hw1_model(input_dim=x_train.shape[1]).to(device)</span><br><span class="line">trainer(train_loader, valid_loader, model, config, device)</span><br><span class="line">end_time = time.time()</span><br><span class="line">print(f&#x27;程序运行时间 &#123;end_time - start_time&#125;&#x27;)</span><br><span class="line"></span><br><span class="line"># save result</span><br><span class="line">def save_pred(preds, file):</span><br><span class="line">    &#x27;&#x27;&#x27; Save predictions to specified file &#x27;&#x27;&#x27;</span><br><span class="line">    with open(file, &#x27;w&#x27;) as fp:</span><br><span class="line">        writer = csv.writer(fp)</span><br><span class="line">        writer.writerow([&#x27;id&#x27;, &#x27;tested_positive&#x27;])</span><br><span class="line">        for i, p in enumerate(preds):</span><br><span class="line">            writer.writerow([i, p])</span><br><span class="line"></span><br><span class="line">model = hw1_model(input_dim=x_train.shape[1]).to(device)</span><br><span class="line">model.load_state_dict(torch.load(config[&#x27;save_path&#x27;]))</span><br><span class="line">preds = predict(test_loader, model, device)</span><br><span class="line">save_pred(preds, &#x27;pred.csv&#x27;)</span><br></pre></td></tr></table></figure>
+<p>最后就是进行模型的训练，这里用time方法记录了一下训练过程的用时。<br>保存结果的部分，首先就是save_pred中的<strong>enumerate</strong>，是一个内置函数，可以<strong>迭代一个容器的同时把下标和元素同时返回</strong>。然后就是加载已经保存的最优model，进行predict，保存结果。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>做了这次的hw收获还是很多的，对示例中的code进行了理解、调整，学了很多实现的写法，了解到了很多之前不留意的小细节，也算是第一次自己跑正式一点的模型吧。不得不说，专业的代码框架设计确实非常精妙，可读性高，易修改，仿照这个框架做一下子就牛逼起来了。</p>
+<p>本次hw代码：<a target="_blank" rel="noopener" href="https://colab.research.google.com/drive/1k9rBeMGZF6FSBYqflJ2gzSFYm_BHU4Vr#scrollTo=T6Dl0CrRbUzJ">colab</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/HW-1-Regreesion.html" data-id="cm4zf9dd20000y73khv9q7sdj" data-title="[HW 1]Regreesion" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/Week2-extra-General-Guide-in-training.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [Week2 extra] General Guide in training
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/Week1-Extra-%E7%94%A8Logistic-Regression%E5%AE%9E%E7%8E%B0classification.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[Week1 Extra] 用Logistic Regression实现classification</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

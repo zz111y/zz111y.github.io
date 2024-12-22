@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>linux配置git并部署到github | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="git的安装首先更新软件列表：1sudo apt update然后直接安装：1sudo apt install git    远程连接github首先使用以下命令生成ssh公钥1ssh-keygen -t rsa -C &quot;email@example.com&quot;点击三次enter即可生成。生成后用文本编辑器打开对应的文件(即id_rsa.pub)，如下所示：将里面的内容全选复制，打">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux配置git并部署到github">
+<meta property="og:url" content="https://zz111y.github.io/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="git的安装首先更新软件列表：1sudo apt update然后直接安装：1sudo apt install git    远程连接github首先使用以下命令生成ssh公钥1ssh-keygen -t rsa -C &quot;email@example.com&quot;点击三次enter即可生成。生成后用文本编辑器打开对应的文件(即id_rsa.pub)，如下所示：将里面的内容全选复制，打">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/4165062626.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1616040545.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2075105816.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1852825467.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2853129452.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1455528370.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1953203131.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/3556235606.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/2940412778.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/1711395986.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/08/336506818.png">
+<meta property="article:published_time" content="2024-12-22T09:49:07.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:49:32.224Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/08/4165062626.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-linux配置git并部署到github" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html" class="article-date">
+  <time class="dt-published" datetime="2024-12-22T09:49:07.000Z" itemprop="datePublished">2024-12-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Env-Setting/">Env Setting</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      linux配置git并部署到github
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="git的安装"><a href="#git的安装" class="headerlink" title="git的安装"></a>git的安装</h1><p>首先更新软件列表：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br></pre></td></tr></table></figure><br>然后直接安装：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install git</span><br></pre></td></tr></table></figure></p>
+<p><div align="center">
+<img src="images/2024/08/4165062626.png" width="80%">
+</div></p>
+<h1 id="远程连接github"><a href="#远程连接github" class="headerlink" title="远程连接github"></a>远程连接github</h1><p>首先使用以下命令生成ssh公钥<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh-keygen -t rsa -C &quot;email@example.com&quot;</span><br></pre></td></tr></table></figure><br>点击三次enter即可生成。生成后用文本编辑器打开对应的文件(即<strong>id_rsa.pub</strong>)，如下所示：<br><img src="images/2024/08/1616040545.png" alt=""><br><img src="images/2024/08/2075105816.png" alt=""><br>将里面的内容全选复制，打开github，进入个人设置中的SSH and GPG keys中，选择add new SSH key，随便取个title，把刚刚那一堆粘到下面，然后add，就会出现下面这么个东西<br><img src="images/2024/08/1852825467.png" alt=""><br>下面输入<code>ssh -T git@github.com</code>，出现下面这个内容，代表连接成功<br><img src="images/2024/08/2853129452.png" alt=""></p>
+<h1 id="git初始化"><a href="#git初始化" class="headerlink" title="git初始化"></a>git初始化</h1><p>新建一个文件夹，运行<code>git init</code>命令初始化该文件夹为git仓库<br><img src="images/2024/08/1455528370.png" alt=""><br>然后用以下命令设置username和email：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;Your name&quot;</span><br><span class="line">git config --global user.email &quot;Your email&quot;</span><br></pre></td></tr></table></figure><br>配置好后，使用<code>git config --lsit</code>可以查看配置信息，如下：<br><img src="images/2024/08/1953203131.png" alt=""></p>
+<h1 id="连接远程仓库"><a href="#连接远程仓库" class="headerlink" title="连接远程仓库"></a>连接远程仓库</h1><p>在github的repository主页可以看到以下内容<br><img src="images/2024/08/3556235606.png" alt=""><br>复制SSH的内容，执行以下语句：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git remote add origin git@github.com:xxx/xxx.git</span><br></pre></td></tr></table></figure><br>其中origin是你本机为这个仓库起的别名，后面是复制粘贴来的，即可连接到远程仓库。连接好后，使用<code>git remote -v</code>即可查看。</p>
+<h1 id="上传到远程仓库"><a href="#上传到远程仓库" class="headerlink" title="上传到远程仓库"></a>上传到远程仓库</h1><p>首先我们写一个文件，然后用add命令将其放到staging area，然后用commit命令将其送到local repository：<br><img src="images/2024/08/2940412778.png" alt=""><br>下一步就可以用push命令将其推送到远程：<br><img src="images/2024/08/1711395986.png" alt=""><br>这时候远程仓库就有本次推送了。</p>
+<hr>
+<h1 id="一些基本操作"><a href="#一些基本操作" class="headerlink" title="一些基本操作"></a>一些基本操作</h1><ul>
+<li><strong>常用查找项目前后缀</strong><ul>
+<li>awesome xxx：百科全书</li>
+<li>xxx sample：找示例</li>
+<li>xxx starter/boilerplate：空项目框架</li>
+<li>xxx tutorial：教程</li>
+</ul>
+</li>
+<li><strong>“借鉴”他人的项目</strong><br>在terminal使用<code>git clone URL</code>即可拷贝指定URL的项目到所在文件夹</li>
+<li><strong>git clone和下载zip解压有什么不同</strong><br>git clone下来的是一个<strong>仓库</strong>，会有一个.git文件，可以执行git相关操作；而download zip得到的没有，需要<code>git init</code>才能让其成为仓库</li>
+<li><strong>提交文件</strong><br>git有三个区域：working dir（当前实际操作的地方）、stage（临时保存改动）、HEAD（指向最后一次提交）<br><img src="images/2024/08/336506818.png" alt=""><ul>
+<li><strong>提出更改</strong>（放到stage）：git add <filename>，使用git add -A可以提交所有更改</li>
+<li><strong>提交更改</strong>（提交到HEAD）：git commit -m “commit-information”</li>
+</ul>
+</li>
+<li><strong>查看历史提交</strong><br>使用<code>git log --stat</code>可以查看历史提交</li>
+<li><strong>替换本地改动</strong><br>使用<code>git checkout &lt;filename&gt;</code>可以将HEAD中的内容替换掉工作目录中的文件，不会影响stage和新建文件。<br>如果已经commit，可以丢弃所有改动，在远程仓库获取最新版本并使本地主分支指向它：<br><code>git fetch origin</code>、<code>git reset --hard origin/master</code>；或者可以使用<code>git reset HEAD^x</code>回到上x个commit；或者可以直接到history版本中将改动部分复制粘贴回来。</li>
+<li><strong>分支</strong><br>master一般放已经完善的代码，如果某个项目需要长时间的开发，建议使用分支功能将其放到另一个分支上，并在完善后将其合并到master上。不同分支互不影响。<ul>
+<li>查看所有分支：<code>git branch</code></li>
+<li>在当前分支新建分支：<code>git checkout -b &lt;branchname&gt;</code></li>
+<li>切换分支：<code>git checkout &lt;mastername&gt;</code></li>
+<li>删除分支：<code>git checkout -d &lt;branchname&gt;</code></li>
+<li>将指定分支合并到当前分支：<code>git merge &lt;branchname&gt;</code></li>
+<li>遇到无法处理的冲突，停止合并：<code>git merge abort</code></li>
+</ul>
+</li>
+<li><strong>交互远程仓库</strong><ul>
+<li>推送HEAD中更改：<code>git push origin branch</code>，其中branch是分支名</li>
+<li>拉取远程仓库：<code>git pull origin branch</code></li>
+</ul>
+</li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html" data-id="cm4zg7wz90002we3khjy0aoyd" data-title="linux配置git并部署到github" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">ubuntu下用qemu模拟freedos编写16位汇编语言</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>

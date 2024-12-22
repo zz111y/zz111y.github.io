@@ -4,17 +4,25 @@
   <meta charset="utf-8">
   
   
-  <title>Archives: 2024/6 | zz111y&#39;s stack</title>
+  <title>[week3]Why Deep | zz111y&#39;s stack</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ">
-<meta property="og:type" content="website">
-<meta property="og:title" content="zz111y&#39;s stack">
-<meta property="og:url" content="https://zz111y.github.io/archives/2024/06/index.html">
+  <meta name="description" content="week2我们讲到这样一张图：本文将探讨Deep Learning是如何做到在一个小的|ℋ|的情况下，仍做到有一个很小的Loss（即$L(h^{all},D_{all})$）。 Why Hidden Layer我们知道，ML的任务是找到一个function，而这个function可以近似为一个分段Linear的function，而只要Activate function（例如sigmoid、ReLU">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[week3]Why Deep">
+<meta property="og:url" content="https://zz111y.github.io/articles/week3-Why-Deep.html">
 <meta property="og:site_name" content="zz111y&#39;s stack">
-<meta property="og:description" content="ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ">
+<meta property="og:description" content="week2我们讲到这样一张图：本文将探讨Deep Learning是如何做到在一个小的|ℋ|的情况下，仍做到有一个很小的Loss（即$L(h^{all},D_{all})$）。 Why Hidden Layer我们知道，ML的任务是找到一个function，而这个function可以近似为一个分段Linear的function，而只要Activate function（例如sigmoid、ReLU">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2792548885.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2416590996.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/1564636475.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/223762964.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3615953620.png">
+<meta property="article:published_time" content="2024-07-31T11:22:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:48:52.846Z">
 <meta property="article:author" content="zz111y">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/07/2792548885.png">
   
     <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
   
@@ -77,39 +85,70 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2024" class="archive-year">2024</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/articles/test.html" class="archive-article-date">
-  <time class="dt-published" datetime="2024-06-29T03:20:00.000Z" itemprop="datePublished">Jun 29</time>
+        <section id="main"><article id="post-week3-Why-Deep" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/week3-Why-Deep.html" class="article-date">
+  <time class="dt-published" datetime="2024-07-31T11:22:00.000Z" itemprop="datePublished">2024-07-31</time>
 </a>
-      
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/articles/test.html">训练一个简单网络模型的方法</a>
+    <h1 class="p-name article-title" itemprop="headline name">
+      [week3]Why Deep
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>week2我们讲到这样一张图：<br><img src="images/2024/07/2792548885.png" alt=""><br>本文将探讨<strong>Deep Learning</strong>是如何做到<strong>在一个小的|ℋ|的情况下，仍做到有一个很小的Loss（即$L(h^{all},D_{all})$）</strong>。</p>
+<h1 id="Why-Hidden-Layer"><a href="#Why-Hidden-Layer" class="headerlink" title="Why Hidden Layer"></a>Why Hidden Layer</h1><p>我们知道，ML的任务是找到一个function，而这个function可以近似为一个<strong>分段Linear的function</strong>，而<strong>只要Activate function（例如sigmoid、ReLU）足够多，就能表示这样一个function</strong>。那么看起来似乎只要<strong>一层非常fat的structure就足够了</strong>，为什么要deep呢？<br><img src="images/2024/07/2416590996.png" alt="Fat + Short v.s. Thin + Tall"><br>下面来看实验结果：<br><img src="images/2024/07/1564636475.png" alt="SeideFrank, Gang Li, and Dong Yu. &quot;Conversational Speech Transcription Using Context-Dependent Deep Neural Networks.&quot;Interspeech.2011."><br>可以看到，在<strong>parameter数量相同</strong>的情况下，deep network确实要比fat network表现的要好很多。这是为什么呢？</p>
+<p>观察下面这张图片：<br><img src="images/2024/07/223762964.png" alt="deep network"><br>以此类推，假设我们有<strong>$2K$个neural</strong>，那么我们就能represent一条<strong>$2^K pieces$组成的function</strong>。可是如果只使用一层Layer，那么每个neural只能表示一个piece，那么要represent同样的function，需要<strong>$2^K$个neural</strong>。<br><img src="images/2024/07/3615953620.png" alt="deep v.s. shallow"><br>[scode type=”green”]虽然一个Hidden Layer能represent任何function<br>但<strong>deep structure更加effective</strong>[/scode]<br>同时，由于deep structure的<strong>neural少</strong>，那么<strong>parameter也会更少</strong>，train起来就<strong>需要较小的|ℋ|</strong>。</p>
+<hr>
+<p>但是这时候又有一个疑问：对于复杂的function，deep structure的效果是好，但是对于简单的function，会不会shallow structure效果更好呢？<br>答案是不会的。有人做过实验：就算是$y=x^2$，deep structure的效果还是要更好。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/week3-Why-Deep.html" data-id="cm4zg7wzd000cwe3k0vok74dc" data-title="[week3]Why Deep" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/week4-Sequence-as-input%E2%80%94%E2%80%94self-attention.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [week4]Sequence as input——self attention
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/week3-extra-CNN.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[week3 extra]CNN</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 
 </section>

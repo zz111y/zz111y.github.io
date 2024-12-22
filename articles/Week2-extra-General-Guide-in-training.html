@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>[Week2 extra] General Guide in training | zz111y&#39;s stack</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="李宏毅老师给出的General Guide：Model Bias指的是Model too simple，这时候我们只需要增加模型的复杂程度即可。但往往有些时候，增加模型复杂程度后其train的效果反而更差了，此时就出现了Optimization issue，解决方法放在后面。如果在train的时候loss小，而在test的时候loss很大，很可能发生了overfitting。对此有以下解决方法：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[Week2 extra] General Guide in training">
+<meta property="og:url" content="https://zz111y.github.io/articles/Week2-extra-General-Guide-in-training.html">
+<meta property="og:site_name" content="zz111y&#39;s stack">
+<meta property="og:description" content="李宏毅老师给出的General Guide：Model Bias指的是Model too simple，这时候我们只需要增加模型的复杂程度即可。但往往有些时候，增加模型复杂程度后其train的效果反而更差了，此时就出现了Optimization issue，解决方法放在后面。如果在train的时候loss小，而在test的时候loss很大，很可能发生了overfitting。对此有以下解决方法：">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2727764113.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2668724858.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2491029082.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3952806775.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2031386315.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/394981967.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/709608771.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/679543323.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3654125339.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/3198263582.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/1555348955.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2946435415.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2391515901.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/379032510.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/397304109.png">
+<meta property="og:image" content="https://zz111y.github.io/articles/images/2024/07/2734923171.png">
+<meta property="article:published_time" content="2024-07-22T11:54:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T09:44:40.790Z">
+<meta property="article:author" content="zz111y">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zz111y.github.io/articles/images/2024/07/2727764113.png">
+  
+    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">zz111y&#39;s stack</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+        
+          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+        
+        <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-Week2-extra-General-Guide-in-training" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/Week2-extra-General-Guide-in-training.html" class="article-date">
+  <time class="dt-published" datetime="2024-07-22T11:54:00.000Z" itemprop="datePublished">2024-07-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      [Week2 extra] General Guide in training
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <p>李宏毅老师给出的<strong>General Guide</strong>：<br><img src="images/2024/07/2727764113.png" alt="General Guide"><br><strong>Model Bias</strong>指的是<strong>Model too simple</strong>，这时候我们只需要增加模型的复杂程度即可。<br>但往往有些时候，增加模型复杂程度后其train的效果反而更差了，此时就出现了<strong>Optimization issue</strong>，解决方法放在后面。<br>如果在<strong>train的时候loss</strong>小，而在<strong>test的时候loss很大</strong>，很可能发生了<strong>overfitting</strong>。对此有以下解决方法：</p>
+<ol>
+<li><strong>增加training data</strong><ul>
+<li>搜集更多data</li>
+<li>根据自己对data的理解<strong>创造data</strong></li>
+</ul>
+</li>
+<li><strong>给Model增加限制</strong><ul>
+<li>Less parameters or Sharing parameters</li>
+<li>Dropout</li>
+<li>Less features</li>
+<li>Early stopping</li>
+<li>Regularization</li>
+</ul>
+</li>
+</ol>
+<p>那么如何在train的时候选择一个<strong>兼顾train loss和test loss</strong>的Model呢？使用<strong>Cross Validation</strong>。<br>简单原理就是，将training data分为<strong>training set</strong>和<strong>validation set</strong>，用<strong>validation set模拟testing data</strong>，以<strong>validation set的loss</strong>作为评判模型好坏的标准。<br>[scode type=”green”]为避免<strong>划分出不好的validation set</strong>，推荐使用<strong>N-fold Cross Validation</strong>。[/scode]</p>
+<h1 id="batch"><a href="#batch" class="headerlink" title="batch"></a>batch</h1><p>问题：为什么要<strong>分batch训练</strong>？<br><img src="images/2024/07/2668724858.png" alt=""><br>这是一张对比图，可以看到分batch后的区别。<br>在考虑<strong>GPU并行计算</strong>后，有以下对比图：<br><img src="images/2024/07/2491029082.png" alt=""><br>可以发现，在一定范围内，反而<strong>大的batch计算效率更快</strong>。下面看看在traning上的表现：<br><img src="images/2024/07/3952806775.png" alt=""><br>分析可知，batch size越大，在<strong>training的时候效果会交叉</strong>。问题在于：<strong>Optimization</strong>。<br>一个可能的解释是：<br><img src="images/2024/07/2031386315.png" alt=""><br>由图可知，大的batch更容易卡住，而小的batch由于<strong>batch不同，loss function不同</strong>，所以不容易被单一Loss卡住。<br>另外，小batch在testing data上的表现往往也更好，见下图：<br><img src="images/2024/07/394981967.png" alt=""><br>由于testing data和training data的分布是<strong>有微小差异的</strong>，因此其<strong>Loss也会有微小差异</strong>。在平坦的地方，training data的minima对应到testing data上时，差异不会很大；而在陡峭的地方，差异就会很大，如图所示。一个可能的解释是：<strong>小batch容易找到平坦地区的minima，大batch容易进入峡谷minima</strong>。</p>
+<p>下面是一张大小batch优缺点对比图：<br><img src="images/2024/07/709608771.png" alt="large batch v.s. small batch"><br>[scode type=”yellow”]<strong>batch size是一个hyperparameter</strong>，需要我们自己去调[/scode]</p>
+<h1 id="momentum"><a href="#momentum" class="headerlink" title="momentum"></a>momentum</h1><p>简单理解为<strong>之前的动作</strong>会对<strong>当前的动作</strong>产生影响，即Movement<strong>不只取决于gradient</strong>，<strong>之前的Movement</strong>也会产生影响。举例如下：</p>
+<ul>
+<li><strong>Strating at</strong> $\theta^0$</li>
+<li><strong>Movemoent</strong> $m^0=0$</li>
+<li><strong>Compute gradient</strong> $g^0$</li>
+<li><strong>Movement</strong> $m^1=\lambda m^0-\eta g^0$</li>
+<li><strong>Move</strong> $\theta^1=\theta^0+m^1$</li>
+<li><strong>Compute gradient</strong> $g^1$</li>
+<li><strong>Movement</strong> $m^2=\lambda m^1-\eta g^1$</li>
+</ul>
+<p><div align="center">
+<img src="images/2024/07/679543323.png" width="50%">
+</div><br>使用momentum在有些情况下可以<strong>帮助走出local minima</strong>。将momentum应用到SGD（stochastic gradient descent)上，叫做SGDM。<br>[scode type=”share”]Gradient Descent是<strong>每次计算所有data的Loss的gradient并更新</strong>，而SGD是在其中<strong>选取部分data计算gradient并更新</strong>。<br>PyTorch中默认提供了SGD的方法，因为训练的时候一般都是<strong>分batch训练并且shuffle</strong>的，相当于每次<strong>随机抽样</strong>。如果<strong>只有一个batch并且不shuffle</strong>，那么虽然调用SGD，但实际相当于普通的Gradient Descent[/scode]</p>
+<h1 id="How-to-solve-Optimization-issue"><a href="#How-to-solve-Optimization-issue" class="headerlink" title="How to solve Optimization issue"></a>How to solve Optimization issue</h1><h2 id="Hessian-Matrix"><a href="#Hessian-Matrix" class="headerlink" title="Hessian Matrix"></a>Hessian Matrix</h2><p>Optimization停下的原因可能是陷入了<strong>gradient接近于0</strong>的点（<strong>critical point</strong>），而这个点并不是universal minima（可能是<strong>local minima</strong>或<strong>saddle point</strong>）。<br><img src="images/2024/07/3654125339.png" alt="local minima and saddle point"><br>我们能够通过一些方法知道某个点是local minima还是saddle point，即通过$L(\theta^\prime)$估计出其附近的值$L(\theta)$：</p>
+<script type="math/tex; mode=display">
+L(\theta)=L(\theta^\prime)+(\theta-\theta^\prime)^Tg+\frac{1}{2}(\theta-\theta^\prime)^TH(\theta-\theta^\prime)</script><p>其中：</p>
+<script type="math/tex; mode=display">
+g=\nabla L(\theta^\prime),g_i=\frac{\partial L(\theta^\prime)}{\partial \theta_i}</script><p>H为Hessian Matrix：</p>
+<script type="math/tex; mode=display">
+H_{ij}=\frac{\partial^2}{\partial \theta_i\theta_j}L(\theta^\prime)</script><p>我们把(\theta-\theta^\prime)记作$v$，那么在critical point上，$g=0$：</p>
+<script type="math/tex; mode=display">
+L(\theta)=L(\theta^\prime)+\frac{1}{2}v^THv</script><p>$v^THv$的正负就能说明是local minima还是saddle point：</p>
+<ul>
+<li>如果对于某些$v$，$v^THv&gt;0$，说明$L(\theta)&gt;L(\theta^\prime)$，那么$L(\theta^\prime)$是local minima。此时<strong>$H$是positive definite的</strong>，即其<strong>所有eigenvalues都是正的</strong>；</li>
+<li>如果对于某些$v$，$v^THv&gt;0$，某些$v^THv&lt;0$，那么$L(\theta^\prime)$是saddle point。$H$<strong>有些eigenvalues为正，有些eigenvalue为负</strong>。</li>
+</ul>
+<p>当遇到saddle point时，$H$可以指明我们该<strong>如何更新</strong>。<br>假设$u$是$H$的一个eigenvector，$\lambda$是$u$对应的eigenvalue，那么有：</p>
+<script type="math/tex; mode=display">
+u^THu=u^T(\lambda u)=\lambda ||u||^2</script><p>假如$\lambda&lt;0$，那么$\lambda ||u||^2=u^THu&lt;0$，那么在$\theta-\theta^\prime=u$的条件下：</p>
+<script type="math/tex; mode=display">
+L(\theta)=L(\theta^\prime)+\frac{1}{2}u^THu</script><p>那么$L(\theta)&lt;L(\theta^\prime)$，此时可知：$\theta=\theta^\prime+u$<br>[scode type=”yellow”]实际应用中，由于计算量太大，这个方法<strong>很少用到</strong>[/scode]</p>
+<p>[scode type=”share”]在实际中，由于parameter数量很大，所以在这样的一个条件下很难找到一个<strong>所有eigenvalues都是正的Hessian Matrix</strong>，因此local minima非常少见，卡住训练的critical point一般都是<strong>saddle point</strong>。[/scode]</p>
+<h2 id="adaptive-learning-rate"><a href="#adaptive-learning-rate" class="headerlink" title="adaptive learning rate"></a>adaptive learning rate</h2><p>在实际train的过程中，卡住训练的往往不是critical point，有这样一种情况：</p>
+<p><div align="center">
+<img src="images/2024/07/3198263582.png" width="50%">
+</div><br>可以看到，实际上陷入了这样一种情况。如果选定一个较大的learning rate，那么在山谷里会遇到这种情况；如果选定一个较小的learning rate，那么在平原上会被阻塞住。由此可见，<strong>learning rate需要根据gradient进行调整</strong>，才能更好的完成optimization。</p>
+<h3 id="Root-Mean-Square"><a href="#Root-Mean-Square" class="headerlink" title="Root Mean Square"></a>Root Mean Square</h3><p>普通的Gradient Descent方法为：$\theta_i^{t+1}=\theta_i^t-\eta g_i^t$<br>Root Mean Square的方法为：</p>
+<script type="math/tex; mode=display">
+\theta_i^{t+1}=\theta_i^t-\frac{\eta}{\sigma_i^t}g_i^t</script><p>其中:</p>
+<script type="math/tex; mode=display">
+\sigma_i^0=\sqrt{(g_i^0)^2}=|g_i^0|</script><script type="math/tex; mode=display">
+\sigma_i^1=\sqrt{\frac{1}{2}[(g_i^0)^2+(g_i^1)^2]}</script><script type="math/tex; mode=display">
+...</script><script type="math/tex; mode=display">
+\sigma_i^t=\sqrt{\frac{1}{t+1}\sum\limits_{j=0}^t(g_i^j)^2}</script><p>这个方法能常用在<strong>Adagrad</strong>中，针对不同的parameter，其learning rate也不同（陡的地方learning rate小、平缓的地方learning rate大）。但并没有考虑到<strong>同一个parameter的gradient变化可能很大</strong>的问题。</p>
+<h3 id="Exploding-Gradient"><a href="#Exploding-Gradient" class="headerlink" title="Exploding Gradient"></a>Exploding Gradient</h3><p><img src="images/2024/07/1555348955.png" alt="Exploding Gradient"><br>在Root Mean Square中，$\sigma_i^t=\sqrt{\frac{1}{t+1}\sum\limits_{j=0}^t(g_i^j)^2}$，当<strong>某一时期的gradient都很小</strong>时，$\frac{1}{t+1}\sum\limits_{j=0}^t(g_i^j)^2$就会累积变得很小，那么$\frac{\eta}{\sigma_i^t}$就会变得很大，此时gradient就会暴走。</p>
+<h3 id="RMSProp"><a href="#RMSProp" class="headerlink" title="RMSProp"></a>RMSProp</h3><p><strong>RMSProp</strong>的方法为：</p>
+<script type="math/tex; mode=display">
+\theta_i^{t+1}=\theta_i^t-\frac{\eta}{\sigma_i^t}g_i^t</script><p>其中:</p>
+<script type="math/tex; mode=display">
+\sigma_i^0=\sqrt{(g_i^0)^2}=|g_i^0|</script><script type="math/tex; mode=display">
+\sigma_i^1=\sqrt{\alpha(\sigma_i^0)^2+(1-\alpha)(g_i^1)^2}</script><script type="math/tex; mode=display">
+...</script><script type="math/tex; mode=display">
+\sigma_i^t=\sqrt{\alpha(\sigma_i^{t-1})^2+(1-\alpha)(g_i^t)^2}</script><p>其中$0&lt;\alpha&lt;1$，是一个<strong>hyperparameter</strong>。</p>
+<h3 id="Adam"><a href="#Adam" class="headerlink" title="Adam"></a>Adam</h3><p>Adam可以看作是<strong>SGDM+RMSProp</strong>。具体如下：<br>SGDM的原理为：</p>
+<script type="math/tex; mode=display">
+\theta^{t+1}=\theta^{t}-\eta m^t</script><script type="math/tex; mode=display">
+m^{t}=\beta_1m^{t-1}+(1-\beta_1)g^{t}</script><p>RMSProp的原理为：</p>
+<script type="math/tex; mode=display">
+\theta_i^{t+1}=\theta_i^t-\frac{\eta}{\sigma_i^t}g_i^t</script><script type="math/tex; mode=display">
+\sigma_i^0=\sqrt{(g_i^0)^2}=|g_i^0|</script><script type="math/tex; mode=display">
+\sigma_i^t=\sqrt{\alpha(\sigma_i^{t-1})^2+(1-\alpha)(g_i^t)^2}</script><p>而<strong>Adam</strong>的方法为：</p>
+<script type="math/tex; mode=display">
+\theta^{t+1}=\theta^t-\frac{\eta}{\hat{\sigma}^t+\epsilon}\hat{m}^t</script><p>其中：</p>
+<script type="math/tex; mode=display">
+\hat{m}^t=\frac{m^t}{1-\beta_1^t}</script><script type="math/tex; mode=display">
+\hat{\sigma}^t=\frac{\sigma^t}{\sqrt{1-\beta_2^t}}</script><p>一般情况下，$\beta_1=0.9,\eta_2=0.999$。$\epsilon$的作用是防止$\hat{\sigma}^t=0$而暴走，一般取$10^{-8}$。</p>
+<p>[scode type=”green”]目前最常用的Optimization就是<strong>Adam</strong>。[/scode]</p>
+<h3 id="Learning-Rate-Schedualing"><a href="#Learning-Rate-Schedualing" class="headerlink" title="Learning Rate Schedualing"></a>Learning Rate Schedualing</h3><p>Adaptive Learning Rate的基本方法是：</p>
+<script type="math/tex; mode=display">
+\theta_i^{t+1}=\theta_i^t-\frac{\eta}{\sigma_i^t}g_i^t</script><p>上面提到的<strong>gradient暴走</strong>问题在这几种方法中都会遇到，解决方法是使用<strong>Learning Rate Schedualing</strong>：</p>
+<script type="math/tex; mode=display">
+\theta_i^{t+1}=\theta_i^t-\frac{\eta^t}{\sigma_i^t}g_i^t</script><p>一种方法是<strong>Learning Rate Decay</strong></p>
+<p><div align="center">
+<img src="images/2024/07/2946435415.png" width="50%">
+</div><br>随着train的进行，我们<strong>越来越接近destination</strong>，那么此时就可以减小$\eta$，使更新变得平稳。</p>
+<p>另一种方法是<strong>Warm Up</strong></p>
+<p><div align="center">
+<img src="images/2024/07/2391515901.png" width="50%">
+</div><br>一种可能的解释是：一开始，$\sigma_i^t$并不精准，所以先使用小的$\eta^t$在初始位置附近<strong>进行探索</strong>。</p>
+<h2 id="L2-Regularization"><a href="#L2-Regularization" class="headerlink" title="L2 Regularization"></a>L2 Regularization</h2><p>train的时候，<strong>给Loss加上一个parameter的惩罚</strong>，就叫做L2 Regularization：</p>
+<script type="math/tex; mode=display">
+L_{l2}(\theta)=L(\theta)+\gamma||\theta||^2</script><p>对于SGD，有：</p>
+<script type="math/tex; mode=display">
+\theta^t=\theta^{t-1}-\nabla L_{l2}(\theta^{t-1})=\theta^{t-1}-\nabla L(\theta^{t-1})-\gamma\theta^{t-1}</script><p>对于SGDM，有：</p>
+<script type="math/tex; mode=display">
+\theta^t=\theta^{t-1}-\lambda m^{t-1}-\eta(\nabla L(\theta^{t-1})+\gamma\theta^{t-1})</script><p>那么：</p>
+<script type="math/tex; mode=display">
+m^t=\lambda m^{t-1}+\eta(\nabla L(\theta^{t-1})+\gamma\theta^{t-1})</script><p>对于Adam，有：</p>
+<script type="math/tex; mode=display">
+m^t=\lambda m^{t-1}+\eta(\nabla L(\theta^{t-1})+\gamma\theta^{t-1})</script><script type="math/tex; mode=display">
+\sigma^t=\beta_2\sigma^{t-1}+(1-\beta_2)(\nabla(L(\theta^{t-1})+\gamma\theta^{t-1})</script><p>上述方法计算$m^t、\sigma^t$时，<strong>将$\gamma\theta^{t-1}$算作其中的一部分</strong>，叫做<strong>L2 regularization</strong>，<strong>否则叫做weight decay</strong>。</p>
+<h2 id="Optimization总结"><a href="#Optimization总结" class="headerlink" title="Optimization总结"></a>Optimization总结</h2><p><img src="images/2024/07/379032510.png" alt="常见的Optimization"><br><img src="images/2024/07/397304109.png" alt="SGDM v.s. Adam"><br><img src="images/2024/07/2734923171.png" alt="Optimization advice"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/Week2-extra-General-Guide-in-training.html" data-id="cm4zf9dd50004y73k0h6l8t8m" data-title="[Week2 extra] General Guide in training" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/articles/week2-How-to-get-a-Good-Train-Data.html" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [week2] How to get a Good Train Data
+        
+      </div>
+    </a>
+  
+  
+    <a href="/articles/HW-1-Regreesion.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">[HW 1]Regreesion</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Categories</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Algorithm/">Algorithm</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/Env-Setting/">Env Setting</a></li><li class="category-list-item"><a class="category-list-link" href="/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">October 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">August 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">June 2024</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/articles/linux%E9%85%8D%E7%BD%AEgit%E5%B9%B6%E9%83%A8%E7%BD%B2%E5%88%B0github.html">linux配置git并部署到github</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E4%B8%8B%E7%94%A8qemu%E6%A8%A1%E6%8B%9Ffreedos%E7%BC%96%E5%86%9916%E4%BD%8D%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80.html">ubuntu下用qemu模拟freedos编写16位汇编语言</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-extra-Q-learning.html">[week12 extra] Q-learning</a>
+          </li>
+        
+          <li>
+            <a href="/articles/ubuntu%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%A4%9A%E7%89%88%E6%9C%ACcuda%E7%9A%84%E5%AE%89%E8%A3%85%E4%B8%8E%E5%88%87%E6%8D%A2.html">ubuntu环境下多版本cuda的安装与切换</a>
+          </li>
+        
+          <li>
+            <a href="/articles/week12-Reinforcement-Learning.html">[week12]Reinforcement Learning</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 zz111y<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.6.4.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ["$","$"], ["\\(","\\)"] ],
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            processEscapes: true
+        }
+    });
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax();
+        for (var i = 0; i < all.length; ++i)
+            all[i].SourceElement().parentNode.className += ' has-jax';
+    });
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<!-- <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</body>
+</html>
