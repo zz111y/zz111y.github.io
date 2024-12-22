@@ -4,26 +4,26 @@
   <meta charset="utf-8">
   
   
-  <title>test | zz111y&#39;s stack</title>
+  <title>训练一个简单网络模型的方法 | zz111y&#39;s stack</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="以torchvision中的CIFAR10数据集为例，介绍一个简单网络模型的训练方法。 CIFAR10介绍CIFAR10是torchvision中给出的数据集，包含了60000张32x32的3通道彩色图像，这些图片被分为了10类，每类有6000张。其中，train集有50000张，test集有10000张。官方文档 网络模型构建这里以现有模型结构进行构建，以下是现有模型结构的示意图（来源：Stru">
 <meta property="og:type" content="article">
-<meta property="og:title" content="test">
-<meta property="og:url" content="http://example.com/2024/12/22/test/index.html">
+<meta property="og:title" content="训练一个简单网络模型的方法">
+<meta property="og:url" content="https://zz111y.github.io/project/2024/06/29/test/index.html">
 <meta property="og:site_name" content="zz111y&#39;s stack">
 <meta property="og:description" content="以torchvision中的CIFAR10数据集为例，介绍一个简单网络模型的训练方法。 CIFAR10介绍CIFAR10是torchvision中给出的数据集，包含了60000张32x32的3通道彩色图像，这些图片被分为了10类，每类有6000张。其中，train集有50000张，test集有10000张。官方文档 网络模型构建这里以现有模型结构进行构建，以下是现有模型结构的示意图（来源：Stru">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://example.com/2024/12/22/test/images/2024/06/3798127767.png">
-<meta property="article:published_time" content="2024-12-22T07:31:40.000Z">
-<meta property="article:modified_time" content="2024-12-22T08:29:41.409Z">
+<meta property="og:image" content="https://zz111y.github.io/project/2024/06/29/test/images/2024/06/3798127767.png">
+<meta property="article:published_time" content="2024-06-29T03:20:00.000Z">
+<meta property="article:modified_time" content="2024-12-22T08:39:27.846Z">
 <meta property="article:author" content="zz111y">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2024/12/22/test/images/2024/06/3798127767.png">
+<meta name="twitter:image" content="https://zz111y.github.io/project/2024/06/29/test/images/2024/06/3798127767.png">
   
-    <link rel="alternate" href="/atom.xml" title="zz111y's stack" type="application/atom+xml">
+    <link rel="alternate" href="/project/atom.xml" title="zz111y's stack" type="application/atom+xml">
   
   
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="shortcut icon" href="/project/favicon.png">
   
   
     
@@ -31,11 +31,11 @@
 
   
   
-<link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/project/css/style.css">
 
   
     
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+<link rel="stylesheet" href="/project/fancybox/jquery.fancybox.min.css">
 
   
   
@@ -49,11 +49,11 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">zz111y&#39;s stack</a>
+        <a href="/project/" id="logo">zz111y&#39;s stack</a>
       </h1>
       
         <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
+          <a href="/project/" id="subtitle">ㄅㄆㄇㄈㄉㄊㄋㄌ巜ㄎㄏ</a>
         </h2>
       
     </div>
@@ -61,20 +61,20 @@
       <nav id="main-nav">
         <a id="main-nav-toggle" class="nav-icon"><span class="fa fa-bars"></span></a>
         
-          <a class="main-nav-link" href="/">Home</a>
+          <a class="main-nav-link" href="/project/">Home</a>
         
-          <a class="main-nav-link" href="/archives">Archives</a>
+          <a class="main-nav-link" href="/project/archives">Archives</a>
         
       </nav>
       <nav id="sub-nav">
         
         
-          <a class="nav-icon" href="/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
+          <a class="nav-icon" href="/project/atom.xml" title="RSS Feed"><span class="fa fa-rss"></span></a>
         
         <a class="nav-icon nav-search-btn" title="Search"><span class="fa fa-search"></span></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://zz111y.github.io/project"></form>
       </div>
     </div>
   </div>
@@ -83,12 +83,12 @@
       <div class="outer">
         <section id="main"><article id="post-test" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
-    <a href="/2024/12/22/test/" class="article-date">
-  <time class="dt-published" datetime="2024-12-22T07:31:40.000Z" itemprop="datePublished">2024-12-22</time>
+    <a href="/project/2024/06/29/test/" class="article-date">
+  <time class="dt-published" datetime="2024-06-29T03:20:00.000Z" itemprop="datePublished">2024-06-29</time>
 </a>
     
   <div class="article-category">
-    <a class="article-category-link" href="/categories/ML/">ML</a>
+    <a class="article-category-link" href="/project/categories/DeepLearning/">DeepLearning</a>
   </div>
 
   </div>
@@ -99,7 +99,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      test
+      训练一个简单网络模型的方法
     </h1>
   
 
@@ -138,7 +138,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2024/12/22/test/" data-id="cm4zannya0000ip3k3zj3547u" data-title="test" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      <a data-url="https://zz111y.github.io/project/2024/06/29/test/" data-id="cm4zannya0000ip3k3zj3547u" data-title="训练一个简单网络模型的方法" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
@@ -146,6 +146,20 @@
   </div>
   
     
+<nav id="article-nav">
+  
+    <a href="/project/2024/07/13/Week1-Introduction-of-Deep-Learning/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          [Week1] Introduction of Deep Learning
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
   
 </article>
 
@@ -158,7 +172,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Categories</h3>
     <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/ML/">ML</a></li></ul>
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/project/categories/DeepLearning/">DeepLearning</a></li><li class="category-list-item"><a class="category-list-link" href="/project/categories/NTU-ML2022/">NTU-ML2022</a></li></ul>
     </div>
   </div>
 
@@ -173,7 +187,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">December 2024</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/project/archives/2024/07/">July 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/project/archives/2024/06/">June 2024</a></li></ul>
     </div>
   </div>
 
@@ -186,7 +200,11 @@
       <ul>
         
           <li>
-            <a href="/2024/12/22/test/">test</a>
+            <a href="/project/2024/07/13/Week1-Introduction-of-Deep-Learning/">[Week1] Introduction of Deep Learning</a>
+          </li>
+        
+          <li>
+            <a href="/project/2024/06/29/test/">训练一个简单网络模型的方法</a>
           </li>
         
       </ul>
@@ -211,25 +229,25 @@
     </div>
     <nav id="mobile-nav">
   
-    <a href="/" class="mobile-nav-link">Home</a>
+    <a href="/project/" class="mobile-nav-link">Home</a>
   
-    <a href="/archives" class="mobile-nav-link">Archives</a>
+    <a href="/project/archives" class="mobile-nav-link">Archives</a>
   
 </nav>
     
 
 
-<script src="/js/jquery-3.6.4.min.js"></script>
+<script src="/project/js/jquery-3.6.4.min.js"></script>
 
 
 
   
-<script src="/fancybox/jquery.fancybox.min.js"></script>
+<script src="/project/fancybox/jquery.fancybox.min.js"></script>
 
 
 
 
-<script src="/js/script.js"></script>
+<script src="/project/js/script.js"></script>
 
 
 
