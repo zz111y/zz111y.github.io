@@ -79,6 +79,80 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-week4-Sequence-as-input——self-attention" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/articles/week4-Sequence-as-input%E2%80%94%E2%80%94self-attention.html" class="article-date">
+  <time class="dt-published" datetime="2024-08-07T08:53:00.000Z" itemprop="datePublished">2024-08-07</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/articles/week4-Sequence-as-input%E2%80%94%E2%80%94self-attention.html">[week4]Sequence as input——self attention</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="Sequence-as-input"><a href="#Sequence-as-input" class="headerlink" title="Sequence as input"></a>Sequence as input</h1><p>在有些背景下input是<strong>一组数量不定的vector</strong>。<br>举例来说，在<strong>语句处理</strong>领域，可以将每个word视作一个vector；在<strong>语音处理</strong>方面，可以将一段语音的一个Frame视作一个vector；或者在<strong>Graph</strong>的问题中，可以将一个node视作一个vector。</p>
+<p>Sequence as input的问题主要有以下三种：</p>
+<ul>
+<li>每个vector<strong>都有一个label</strong>（例如POS tagging）；</li>
+<li>整个sequence的output是<strong>一个label</strong>（例如sentiment analysis、speaker recognization）；</li>
+<li><strong>Model决定输出vector的数量</strong>，叫做<strong>Seq2Seq</strong>（例如翻译）。</li>
+</ul>
+<p>本文以第一种：每个vector<strong>都有一个label</strong>（又叫<strong>Sequence labling</strong>）为例来讨论<strong>Self-attention的工作机制</strong>。</p>
+<h1 id="self-attention"><a href="#self-attention" class="headerlink" title="self-attention"></a>self-attention</h1><p>对于一个sequence，fully-connected network有一个显著的缺陷：<strong>无法考虑多个vector之间的关联</strong>。而HW2中多个vector拼接为一个vector的方法不适用于<strong>seq长度可变</strong>的情况。self-attention就是用来处理sequence as input的情况的。</p>
+<h2 id="工作机制"><a href="#工作机制" class="headerlink" title="工作机制"></a>工作机制</h2><p>对于seq中每一个input vector，self-attention会吃一整个seq的信息，并输output一个特特殊的vector：<br><img src="images/2024/08/3787030471.png" alt="self-attention"><br>具体是如何做到的后面会详细说明，self-attention可以叠加使用多次：self-attention处理整个seq的信息，然后使用fc处理每个单独vector的信息，再使用self-attention处理整个output vector seq的信息…</p>
+<p>假设input seq中有一个vector是$a^i$，那么其输出$b^i$是综合了seq中所有vector得到的：<br><img src="images/2024/08/4000611276.png" alt="self-attention"><br>这里只解释$b^1$的形成机制，其他的同理。</p>
+<h2 id="relevant"><a href="#relevant" class="headerlink" title="relevant"></a>relevant</h2><p>我们想找到所有与$a^1$相关的vector，又不想考虑与$a^1$无关的vector，因此，第一步就是<strong>计算$a^1$与其他vector的相关性</strong>。这里有一个专门处理两个vector $a^i$和$a^j$关联程度的方法，即输入$a^i$和$a^j$，输出其<strong>关联程度$\alpha_{i,j}$</strong>。具体的计算方法不一，较为常见的为<strong>使用Dot-product</strong>：令$a^i$乘以矩阵$W^q$得到$q$，$a^j$乘以矩阵$W^k$得到$k$，那么$\alpha_{i,j}=q\cdot k$，其中$\alpha$叫做<strong>attention score</strong>。还有一种常见的方法为Additive，如下图所示：<br><img src="images/2024/08/3734183805.png" alt="Dot-productive and Additive"><br>本文主要使用Dot-product，这是最常用的，也是transformer中使用的。</p>
+<p>应用在self-attention中，计算$a^1$和其他所有vector的关联性，实际操作中，<strong>自己也要和自己计算关联性</strong>。计算完关联性后，所有的$\alpha$经过一个softmax后得到$\alpha^\prime$（没有什么道理，使用其他normalization也行）：<br><img src="images/2024/08/2712051742.png" alt="compute relevant"></p>
+<p>得到所有的attention score后，要从中提取信息，方法为：对于$\alpha^1$，先将所有的$\alpha$乘以一个矩阵$W^v$得到$v$，然后乘以其对应的attention score，再将结果相加（即对$v$做一个<strong>weighted sum</strong>）得到$b^1$，那么<strong>谁的$v$越接近$b^1$，代表谁和$\alpha^1$越相关</strong>：<br><img src="images/2024/08/4055030727.png" alt=""><br>在这个例子中，从$a^1~a^4$得到$b^1~b^4$的过程，就是<strong>self-attention</strong>的过程。其计算过程看似复杂，但以矩阵的视角来进行，其所有计算都是同时进行的。</p>
+<h2 id="self-attention-matrix-representation"><a href="#self-attention-matrix-representation" class="headerlink" title="self-attention matrix-representation"></a>self-attention matrix-representation</h2><p>所有$b^i$的得到方式与$b^1$同理，那么有：</p>
+<script type="math/tex; mode=display">
+q^i=W^qa^i</script><script type="math/tex; mode=display">
+k^i=W^ka^i</script><script type="math/tex; mode=display">
+v^i=W^va^i</script><p>将所有的$a$拼接为一个矩阵，可以得到：<br><img src="images/2024/08/3755362515.png" alt="self-attention matrix-representation"><br>接下来，每一个$q$会和每一个$k$做Dot-product，得到attention score，同样将其拼接为一个矩阵：<br><img src="images/2024/08/1149814991.png" alt="self-attention matrix-representation"><br>综合以上两步以及normalization，可以得到所有的attention score：<br><img src="images/2024/08/2304290509.png" alt="self-attention matrix-representation"><br>最后对每一个$a$的$v$做一个weighted sum，得到$b$：<br><img src="images/2024/08/3114213706.png" alt="self-attention matrix-representation"></p>
+<p>总结以上所有过程，得到self-attention真正运作的过程：<br><img src="images/2024/08/1109922326.png" alt="self-attention matrix-representation"><br>看似复杂的操作，其中<strong>需要学习的parameters只有$W^q、W^k、W^v$</strong>。</p>
+<h1 id="Multi-head-Self-attention"><a href="#Multi-head-Self-attention" class="headerlink" title="Multi-head Self-attention"></a>Multi-head Self-attention</h1><p>[scode type=”share”]<strong>why multi-head</strong>?<br>两个事物的相关性可能有<strong>多种表现形式</strong>，需要用不同的$q、k、v$来表示不同的相关性[/scode]<br>以two heads为例，其做法为：对于一个$a^i$的$q^i、k^i、v^i$，分别乘以两个不同的矩阵，得到两组矩阵：$q^{i,1}、k^{i,1}、v^{i,1}$和$q^{i,2}、k^{i,2}、v^{i,2}$，对两组矩阵分别进行self-attention。<br><img src="images/2024/08/1437060038.png" alt="2 heads self-attention"><br>随后将其attention score综合起来，得到最终的attention score</p>
+<p><div align="center">
+<img src="images/2024/08/2963752312.png" width="50%">
+</div></p>
+<h1 id="Positional-Encoding"><a href="#Positional-Encoding" class="headerlink" title="Positional Encoding"></a>Positional Encoding</h1><p>上面的self-attention有一个缺陷：<strong>无法考虑每个vector的位置信息</strong>。但位置的信息在某些情况下非常重要。<br>解决方法为使用<strong>Positional Encoding</strong>，即为seq中每一个vector $a$都加上一个位置信息$e$，这个e是<strong>人为设置的</strong>，所以其设置方法仍是一个可深入研究的问题。下图是一个$e$的设置方法举例：<br><img src="images/2024/08/1545176778.png" alt="Positional Encoding"><br>一篇有关Positional Encoding的paper：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2003.09229">Learning to Encode Position for Transformer with Continuous Dynamical Model</a></p>
+<h1 id="Applications"><a href="#Applications" class="headerlink" title="Applications"></a>Applications</h1><p>self-attention在许多方面都有应用，例如transformer <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1706.03762">《attention is all you need》</a>；BERT <a target="_blank" rel="noopener" href="https://arxiv.org/abs/1810.04805">《BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding》</a></p>
+<h2 id="Truncated-Self-attention"><a href="#Truncated-Self-attention" class="headerlink" title="Truncated Self-attention"></a>Truncated Self-attention</h2><p>self-attention中需要学习的$W^q、W^k、W^v$，其parameters的大小是同seq中vector的数量成平方关系的，因此seq中的vector数量很大很大的时候，parameters的数量会特别大，导致Model训练很困难。因此在某些情况下，可以<strong>只考虑seq中部分vector</strong>，此即Truncated self-attention。例如在语音辨识中，当前vector可能只和其附近的vector有关联，详见<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1910.12977">《Transformer-Transducer: End-to-End Speech Recognition with Self-Attention》</a>。<br><img src="images/2024/08/500544821.png" alt="Truncated self-attention"></p>
+<h2 id="self-attention-for-Image"><a href="#self-attention-for-Image" class="headerlink" title="self-attention for Image"></a>self-attention for Image</h2><p>对于一张图片，可以同时将其三个channels视作一个Sequence，这也可以视作为sequence as input，因此<strong>对于一张图片，也有应用self-attention的可能性</strong>。<br><img src="images/2024/08/1543565533.png" alt="self-attention for Image"><br>下面这两个paper就在image处理中使用了self-attention：<br><a target="_blank" rel="noopener" href="https://arxiv.org/abs/1805.08318">《Self-Attention Generative Adversarial Networks》</a><br><a target="_blank" rel="noopener" href="https://arxiv.org/abs/2005.12872">《End-to-End Object Detection with Transformers》</a></p>
+<h1 id="Self-attention-v-s-CNN"><a href="#Self-attention-v-s-CNN" class="headerlink" title="Self-attention v.s. CNN"></a>Self-attention v.s. CNN</h1><p>self-attention和CNN都是同时考虑多个vector，如果将一组<strong>强相关的vector</strong>视作一个receptive filed，那么相比于CNN的receptive filed，<strong>self-attention</strong>的receptive filed是Model学习得到的。<br><img src="images/2024/08/3259953941.png" alt="Self-attention v.s. CNN"><br>这篇paper使用严谨的数学推导描述了其关系：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/1911.03584">《On the Relationship between Self-Attention and Convolutional Layers》</a></p>
+<p>这篇paper中讲述了self-attention和CNN的对比：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2010.11929">《An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale》</a><br><img src="images/2024/08/2841154817.png" alt=""><br>结果显示，在train data较少的时候，CNN表现更好；在train data较多的时候，self-attention效果更好。可能的原因是：self-attention的Model弹性更大，需要更多的data来train。</p>
+<h1 id="Self-attention-v-s-RNN"><a href="#Self-attention-v-s-RNN" class="headerlink" title="Self-attention v.s. RNN"></a>Self-attention v.s. RNN</h1><p>以下图来解释两者的关系：<br><img src="images/2024/08/2899915646.png" alt="Self-attention v.s. RNN"><br>相较于self-attention，RNN<strong>很难考虑距离较远的vector</strong>，并且RNN的无法平行计算，其效率远不如self-attention。因此，self-attention在很大程度上是优于RNN的，当前很多RNN架构也逐渐self-attention化。更详细的讲解：<a target="_blank" rel="noopener" href="https://arxiv.org/abs/2006.16236">《ransformers are RNNs: Fast Autoregressive Transformers with Linear Attention》</a></p>
+<h1 id="Self-attention-for-Graph"><a href="#Self-attention-for-Graph" class="headerlink" title="Self-attention for Graph"></a>Self-attention for Graph</h1><p>Graph中的每个node也可以作为seq输入，因此graph也可以应用self-attention。这也是GNN的一种。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://zz111y.github.io/articles/week4-Sequence-as-input%E2%80%94%E2%80%94self-attention.html" data-id="cm4zg7wzd000hwe3k9v1l2lnd" data-title="[week4]Sequence as input——self attention" class="article-share-link"><span class="fa fa-share">Share</span></a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-week3-Why-Deep" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/articles/week3-Why-Deep.html" class="article-date">
@@ -880,115 +954,6 @@ L(\theta)=\sum\limits_{n=1}^NC^n(\theta)</script><p>对于$L$的gradient，有�
     </div>
     <footer class="article-footer">
       <a data-url="https://zz111y.github.io/articles/Week1-extra-Backpropogation.html" data-id="cm4zf3c6900007y3k6he4fulk" data-title="[Week1 extra] Backpropogation" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-Week1-Introduction-of-Deep-Learning" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/articles/Week1-Introduction-of-Deep-Learning.html" class="article-date">
-  <time class="dt-published" datetime="2024-07-12T16:07:00.000Z" itemprop="datePublished">2024-07-13</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/NTU-ML2022/">NTU-ML2022</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/articles/Week1-Introduction-of-Deep-Learning.html">[Week1] Introduction of Deep Learning</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="Machine-Learning"><a href="#Machine-Learning" class="headerlink" title="Machine Learning"></a>Machine Learning</h1><p>ML就是让机器<strong>找到一个function</strong>。<br>例如：向function输入一段语音，输出语音对应的文字；向function输入一张图片，输出图片是什么；向function输入一张棋盘，输出下一步最佳落子位置……</p>
-<p>根据function的不同，ML主要分为两种：<strong>Regression</strong>和<strong>Classification</strong></p>
-<ul>
-<li>Regression：function的output是一个<strong>scalar</strong>；</li>
-<li>Classification：function的output是一个给定的<strong>option(class)</strong>。</li>
-</ul>
-<p>但在简单的Regression和Classification之外，ML还有更为广泛的领域：<strong>Structured Learning</strong>，也即让机器学会创作，产生一个<strong>有结构的事物</strong>，例如一篇文章，一张图……</p>
-<h2 id="如何实现ML"><a href="#如何实现ML" class="headerlink" title="如何实现ML"></a>如何实现ML</h2><p>要实现ML，通常需要以下步骤：</p>
-<h3 id="一、构建function"><a href="#一、构建function" class="headerlink" title="一、构建function"></a>一、构建function</h3><p>我们往往需要根据对应领域的知识，构建出一个<strong>带有未知parameters的function</strong>。以$y=b+wx_1$为例，该functino就叫做一个<strong>Model</strong>，其中$x_1$作为已知量输入，叫做<strong>feature</strong>，w（weight)和b（bias）就是未知的parameters。</p>
-<h3 id="二、定义Loss"><a href="#二、定义Loss" class="headerlink" title="二、定义Loss"></a>二、定义Loss</h3><p>Loss是一个<strong>关于parameters的function</strong>。Loss通过比较Model的output与真实值之间的差异，来表示某一组parameter的好坏。常见的Loss定义为：$L=\frac{1}{N}\sum\limits_ne_n$，其中e可以是$|y-\hat{y}|$（此时L叫做mean absolute error，MAE）或$(y-\hat{y})^2$（此时L叫做mean square error，MSE）等，需要根据具体情况进行选择。例如如果$y$和$\hat{y}$是一个概率分布的时候，往往选择Cross-entorpy。</p>
-<h3 id="三、Optimization"><a href="#三、Optimization" class="headerlink" title="三、Optimization"></a>三、Optimization</h3><ul>
-<li>目标：找到$w^<em>,b^</em>=\mathop{\arg\min}\limits_{w,b}L$。</li>
-<li>方法：<strong>Gradient Descent</strong>（暂不考虑local optimum）。</li>
-<li>步骤（以$w$为例）：<ol>
-<li>随机选取一组随机初始值$w^0,b^0$；</li>
-<li>计算$\frac{\partial L}{\partial w}|_{w=w^0}$；</li>
-<li>为了让Loss的值变小，则更新$w$为：$w^1=w^0-\eta \frac{\partial L}{\partial w}|_{w=w^0}$，其中$\eta$叫做<strong>learning rate</strong>，是一个<strong>Hyperparameter</strong></li>
-<li>迭代进行2、3两步，直到终止（不想继续进行了，或者计算出$\frac{\partial L}{\partial w}|_{w=w^0}=0$）</li>
-</ol>
-</li>
-</ul>
-<p><strong>Hyperparameter</strong>：人为设置的参数，不是机器需要学习的parameter</p>
-<h2 id="更加复杂的情况"><a href="#更加复杂的情况" class="headerlink" title="更加复杂的情况"></a>更加复杂的情况</h2><h3 id="Sophisticated-Model"><a href="#Sophisticated-Model" class="headerlink" title="Sophisticated Model"></a>Sophisticated Model</h3><p>实际中，function往往并非线性，而是十分复杂的，这时，应用简单的线性Model并不能解决问题，我们需要更加复杂的Model。在ML中，解决方法一般如下：<br><img src="images/2024/07/3743548032.png" alt="sophisticated Model"><br>可以看到，要获得一个如图所示的红色曲线，需要三个类似形状的<strong>蓝色曲线</strong>（hard-sigmoid function）和一个<strong>常数项</strong>相加得到。以此为例，不难得出：任何一个复杂的函数，都可以由多个如图所示的蓝色曲线和一个常数项相加<strong>近似得到</strong>。</p>
-<h3 id="sigmoid-function"><a href="#sigmoid-function" class="headerlink" title="sigmoid function"></a>sigmoid function</h3><p>可是，由于蓝色曲线并非光滑的，所以对其进行Optimization非常困难，因此，这里采用<strong>sigmoid函数</strong>去逼近蓝色曲线。<strong>sigmoid函数</strong>如下图所示：<br><img src="images/2024/07/548121614.png" alt="Structure of CIFAR10-quick model"><br>其函数表达式为：$y=c\frac{1}{1+e^{-b+wx_1}}$，简单记作$y=c sigmoid(b+wx_1)$。<br>那么，上面的sophisticated Model就可以转化为：$y=b+\sum\limits_ic_isigmoid(b_i+w_ix_1)$<br>对于一个sigmoid function来说，改变其参数可以得到不同形状的sigmoid function：<br><img src="images/2024/07/1242558349.png" alt="different sigmoid function"><br>有了这些<strong>不同的sigmoid function</strong>，将其叠加后就可以<strong>逼近不同的non-linear Model</strong>。</p>
-<h3 id="multi-feature-Model"><a href="#multi-feature-Model" class="headerlink" title="multi-feature Model"></a>multi-feature Model</h3><p>到目前为止，这样的Model还有一个不足：无法应对多feature的情况。对此，我们将其进行改进，给Model<strong>添加多个feature</strong>后，得到如下Model：$y=b+\sum\limits_ic_isigmoid(b_i+\sum\limits_jw_{ij}x_{j})$，其中$j$为feature的编号。<br>假设某Model需要三个sigmoid function，那么我们可以通过下图<strong>直观的观察到其中的关系</strong>：<br><img src="images/2024/07/4222411239.png" alt=""><br>接下来，使用<strong>矩阵</strong>来<strong>简洁的表达其中的运算</strong>：</p>
-<script type="math/tex; mode=display">
-\begin{equation}
-\begin{bmatrix}
- r_1 \\ r_2 \\ r_3
-\end{bmatrix}
-=
-\begin{bmatrix}
- b_1 \\ b_2 \\ b_3
-\end{bmatrix}
-+
-\begin{bmatrix}
- w_{11} & w_{12} & w_{13} \\ w_{21} & w_{22} & w_{23} \\ w_{31} & w_{32} & w_{33}
-\end{bmatrix}
-\begin{bmatrix}
- x_1 \\ x_2 \\ x_3
-\end{bmatrix}
-\end{equation}</script><p>用符号表示为：$r=b+Wx$<br>整个Model由下图给出：<br><img src="images/2024/07/257902148.png" alt=""></p>
-<h3 id="Optimization"><a href="#Optimization" class="headerlink" title="Optimization"></a>Optimization</h3><p>对于$y=b+c^Ta$中所有未知的parameter（包括$b、c、W、b$），将其中元素拼成一个列向量</p>
-<script type="math/tex; mode=display">
-\begin{equation}
-\theta=
-\begin{bmatrix}
- \theta_1 \\ \theta_2 \\ \vdots
-\end{bmatrix}
-\end{equation}</script><p>要进行Optimization，即找到$\theta^*=\mathop{\arg\min}\limits_\theta L$。步骤和最基本的Model类似，先随机选取一个初始值$\theta^0$，然后计算</p>
-<script type="math/tex; mode=display">
-\begin{equation}
-g=
-\begin{bmatrix}
-\frac{\partial L}{\partial \theta_1}|_{\theta=\theta^0} \\
-\frac{\partial L}{\partial \theta_2}|_{\theta=\theta^0} \\
-\vdots
-\end{bmatrix}
-\end{equation}</script><p>记作$g=\nabla L(\theta^0)$。最后更新参数即可：$\theta^1=\theta^0-\eta g$</p>
-<h3 id="train-as-batch"><a href="#train-as-batch" class="headerlink" title="train as batch"></a>train as batch</h3><p>实际Optimization的过程中，往往将train data<strong>分为多个batch</strong>，记每个batch对parameter的一次Optimization为<strong>一次update</strong>，所有batch串行进行一次update叫做<strong>一个epoch</strong>。如下图所示：<br><img src="images/2024/07/425677454.png" alt="epoch-update"><br>那么<strong>batch size和epoch</strong>也就成为了<strong>Hyperparameter</strong>。</p>
-<h3 id="ReLU"><a href="#ReLU" class="headerlink" title="ReLU"></a>ReLU</h3><p>这样的Model有一个变体，我们使用<strong>ReLU</strong>（Rectified Linear Unit）来代替sigmoid function，ReLU如下图所示：<br><img src="images/2024/07/2218813359.png" alt="ReLU"><br>只要将两个ReLU叠加，就可以得到hard-sigmoid funccion：<br><img src="images/2024/07/2679937844.png" alt=""><br>那么对于上述Model，就可以表示为：$y=b+\sum\limits_{2i}c_imax(b_i+\sum\limits_jw_{ij}x_{j})$</p>
-<p>对于sigmoid function和ReLU这样的函数，我们统称为<strong>Activate function</strong>。</p>
-<h1 id="Deep-Learning"><a href="#Deep-Learning" class="headerlink" title="Deep Learning"></a>Deep Learning</h1><p>我们可以将上述Model进行套娃，如下图所示：<br><img src="images/2024/07/548161856.png" alt=""><br>每个Activate function叫做一个<strong>Neuron</strong>，所有Neuron的总和叫做<strong>Neural Network</strong>；每一列Neuron叫做一个<strong>hidden layer</strong>，<strong>包含多个hidden layer的Model</strong>即是<strong>Deep Learning</strong>。<br><img src="images/2024/07/1753846494.png" alt="Deep Learning"><br>其中，$x_1,x_2,…$叫做<strong>Input Layer</strong>，Output前的最后一层叫做<strong>Output Layer</strong>。</p>
-<p>大多数情况下，Deep Learning的表现要比单层的Model更好。但hidden layer过多会导致<strong>over fitness</strong>。</p>
-<p>network的structure是非常重要的，需要自己设计好stucture，才能获得好的效果。设计的依据：试错+直觉。</p>
-<hr>
-<p>那么，相对于Machine Learning，Deep Learning究竟做了什么呢？<br>其实就是<strong>把一个问题转化为了另一个问题</strong>。对于ML，往往需要<strong>找一组好的feature</strong>，这在有些场景下是非常困难的。但在DL中，只需要将一组不是那么好的feature放到一个<strong>设计好的structure</strong>中，就能得到较好的效果。因此问题从<strong>find feature</strong>转化为了<strong>design a network</strong>，而DL和ML的优劣，就归结于<strong>这两个问题哪个较为容易解决</strong>（例如在NLP领域，抽一组好的feature往往是更容易的；而对于影像辨识和语音辨识，抽一组好的feature是比较困难的）。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="https://zz111y.github.io/articles/Week1-Introduction-of-Deep-Learning.html" data-id="cm4zd1vkq00006r3kf3ul4lw2" data-title="[Week1] Introduction of Deep Learning" class="article-share-link"><span class="fa fa-share">Share</span></a>
       
       
       
